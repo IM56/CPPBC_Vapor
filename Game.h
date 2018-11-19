@@ -3,6 +3,7 @@
 //Student number: 
 #pragma once
 
+#include <iostream>
 #include <string>
 
 class Game

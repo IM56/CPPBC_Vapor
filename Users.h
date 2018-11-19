@@ -5,6 +5,10 @@
 
 #include <string>
 #include <list>
+#include <iomanip>
+
+#include "Game.h"
+#include "Wallet.h"
 
 //--
 // UserTypeId represents an identifier for the specific user type.
@@ -65,11 +69,13 @@ public:
 
 	const PlayerUser::GameList& get_game_list() const { return m_ownedGames; }
 
-	double get_available_funds() const { return m_accountFunds; }
+	double get_available_funds() const { return m_wallet.get_available_funds(); }
+
+	void add_funds();
 
 private:
 	GameList m_ownedGames; // List of owned games.
-	double m_accountFunds; // The players available funds.
+	Wallet m_wallet; // The players available funds.
 };
 
 //--
