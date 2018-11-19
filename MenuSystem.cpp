@@ -97,7 +97,8 @@ int MenuSystem::run_player_user_menu()
 	do
 	{
 		std::cout << "Player Menu (" << m_pUser->get_username() << ")\n";
-		std::cout << "Wallet \x9C" << pPlayerUser->get_available_funds() << "\n";
+		std::cout << "Wallet \x9C" << std::setprecision(2) << 
+			pPlayerUser->get_available_funds() << std::fixed << "\n";
 		std::cout << "(1) List All Games\n";
 		std::cout << "(2) List My Games\n";
 		std::cout << "(3) Buy Game\n";
@@ -112,7 +113,7 @@ int MenuSystem::run_player_user_menu()
 		case '1': list_all_games(); break;
 		case '2': std::cout << "TODO\n"; break;
 		case '3': std::cout << "TODO\n"; break;
-		case '4': std::cout << "TODO\n"; break;
+		case '4': pPlayerUser->add_funds(); break;
 		case 'q': result = -1; break;
 		default:  std::cout << "INVALID OPTION\n"; break;
 		}
