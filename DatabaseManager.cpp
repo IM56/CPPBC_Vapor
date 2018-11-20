@@ -59,7 +59,7 @@ void DatabaseManager::add_user(UserBase* pUser)
 	}
 }
 
-UserBase* DatabaseManager::find_user(const UserBase::Username& username)
+UserBase* DatabaseManager::find_user(const Username& username)
 {
 	auto it = m_users.find(username);
 	if (it != m_users.end())
