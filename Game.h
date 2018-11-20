@@ -1,7 +1,8 @@
 //C++ Boot Camp - Task 2 - 2018-19 
 //Name: Ismail Movahedi
 //Student number: 28039547
-#pragma once
+#ifndef GAME_H
+#define GAME_H
 
 #include <iostream>
 #include <string>
@@ -31,5 +32,4 @@ private:
 	std::string m_description; // Some information about the game.
 };
 
-
-
+#endif

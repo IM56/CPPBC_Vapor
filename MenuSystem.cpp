@@ -78,7 +78,7 @@ int MenuSystem::run_admin_user_menu()
 		case '1': list_all_games(); break;
 		case '2': list_all_users(); break;
 		case '3': std::cout << "TODO\n"; break;
-		case '4': std::cout << "TODO\n"; break;
+		case '4': pAdminUser->createUser(); break;
 		case 'q': result = -1; break;
 		default:  std::cout << "INVALID OPTION\n"; break;
 		}

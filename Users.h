@@ -1,11 +1,13 @@
 //C++ Boot Camp - Task 2 - 2018-19 
 //Name: Ismail Movahedi
 //Student number: 28039547
-#pragma once
+#ifndef USERS_H
+#define USERS_H
 
 #include <string>
 #include <list>
 #include <iomanip>
+#include <memory>
 
 #include "Game.h"
 #include "Wallet.h"
@@ -82,6 +84,8 @@ private:
 //--
 // AdminUser represents a system user who has privileges to modify the system.
 //--
+class UserFactory;
+
 class AdminUser : public UserBase
 {
 public:
@@ -90,35 +94,36 @@ public:
 
 	// define the specific user type.
 	virtual const UserTypeId get_user_type() const override { return UserTypeId::kAdminUser; }
+
+	void createUser();
+
+private:
+	static UserFactory uFactory;
 };
 
-//--
-// Create an abstract UserBuilder class
-//--
-class UserBuilder
+//------
+// UserFactory class
+// ------
+
+class DatabaseManager;
+
+class UserFactory
 {
 public:
-	UserBuilder() : pUserBase(nullptr) {}
-	virtual ~UserBuilder();
+	UserFactory() : pUserBase(nullptr) {}
+	virtual ~UserFactory(){};
+	/*
+	virtual UserBase* createPlayerUser();
+	virtual UserBase* createAdminUser();
+	*/
+	UserBase* createNewUser();
 
-	virtual void setPassword();
-	virtual void setEmail();
+private:
+	Username setUsername();
+	void setPassword();
+	void setEmail();
 
-	const UserBase& getUser() { return *pUserBase; }
-
-protected:
-	UserBase* pUserBase;
+	 std::shared_ptr<UserBase> pUserBase;
 };
 
-//----------------
-// Concrete PlayerUserBuilder class
-//----------------
-class PlayerUserBuilder : public UserBuilder
-{
-public:
-	PlayerUserBuilder(const Username& uname) { pUserBase = new PlayerUser(uname, "", ""); }
-
-
-
-	
-};
+#endif

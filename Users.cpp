@@ -1,10 +1,9 @@
 //C++ Boot Camp - Task 2 - 2018-19 
 //Name: Ismail Movahedi
 //Student number: 28039547
-#pragma once
 
 #include "Users.h"
-
+#include "DatabaseManager.h"
 // ------------------------
 // PlayerUser class implementation
 // ------------------------
@@ -25,20 +24,93 @@ void PlayerUser::add_funds()
 	std::cout << " added to your wallet.\n\n"; 
 }
 
-// ------------------------
-// UserBuilder class implementation
-// ------------------------
+// -------------------------------
+// UserFactory implementation
+// -------------------------------
+UserFactory AdminUser::uFactory;
 
-UserBuilder::~UserBuilder()
+/*
+UserBase* UserFactory::createPlayerUser()
 {
-	if (pUserBase)
-	{
-		delete pUserBase;
-		pUserBase = nullptr;
-	}
+	Username uname = setUsername();
+	pUserBase = new PlayerUser(uname, "", ""); // Create a new player with this username
+	setEmail();								   // Prompt user to provide an email address
+	setPassword();							   // Prompt user to provide a password
+	pdbMan->add_user(pUserBase);			   // Update the database to include the new player user
+	return pUserBase;
 }
 
-void UserBuilder::setPassword()
+UserBase * UserFactory::createAdminUser()
+{
+	Username uname = setUsername();
+	pUserBase = new AdminUser(uname, "", ""); // Create a new admin with this username
+	setEmail();								   // Prompt user to provide an email address
+	setPassword();							   // Prompt user to provide a password
+	pdbMan->add_user(pUserBase);			   // Update the database to include the new admin user
+	return pUserBase;
+}
+*/
+
+UserBase* UserFactory::createNewUser()
+{
+	UserTypeId usertype;
+	std::cout << "\nWhat type of user would you like to create?"
+		<< "\n(1) Create an admin user"
+		<< "\n(2) Create a player user"
+		<< "\nPress any other key to exit this menu";
+
+	char option;
+	std::cin >> option;
+
+	switch (option)
+	{
+	case '1':
+	{
+		usertype = UserTypeId::kAdminUser;
+		break;
+	}
+	case '2':
+	{
+		usertype = UserTypeId::kPlayerUser;
+		break;
+	}
+	default:
+	{
+		usertype = UserTypeId::kInvalid;
+		return nullptr;
+	}
+	}
+
+	Username uname = setUsername();
+
+	if (usertype == UserTypeId::kAdminUser)
+		pUserBase = std::make_shared<AdminUser>(AdminUser(uname, "", "")); // Create a new admin with this username
+	else if (usertype == UserTypeId::kPlayerUser)
+		pUserBase = std::make_shared<PlayerUser>(PlayerUser(uname, "", "")); // Create a new player with this username
+
+	setEmail();								   // Prompt user to provide an email address
+	setPassword();							   // Prompt user to provide a password
+	DatabaseManager::instance().add_user(pUserBase.get());			   // Update the database to include the new player user
+	return pUserBase.get();
+}
+
+Username UserFactory::setUsername()
+{
+	Username uname;
+	while (uname == "")  // Prompt user to input the new username for the account
+	{
+		std::cout << "\nEnter the new username: ";
+		std::cin >> uname;
+		if (DatabaseManager::instance().find_user(uname))  // Check if the username already exists
+		{
+			std::cout << "\nSorry, the name <" << uname << "> is already taken! Please try again.";
+			uname = "";
+		}
+	}
+	return uname;
+}
+
+void UserFactory::setPassword()
 {
 	std::string password, verify;
 	while (password == "")   // Prompt user until they provide a password
@@ -58,15 +130,23 @@ void UserBuilder::setPassword()
 	pUserBase->set_password(password);
 }
 
-void UserBuilder::setEmail()
+void UserFactory::setEmail()
 {
 	std::string email;
-	while (email == "" || email.find_first_of('@') == std::string::npos || email.find_first_of('@') != email.find_last_of('@'))
+	while (email == "")
 	{
 		std::cout << "\nPlease enter an email address: ";
 		std::cin >> email;
 		if (email == "" || email.find_first_of('@') == std::string::npos || email.find_first_of('@') != email.find_last_of('@'))
+		{
 			std::cout << "\nSorry, that wasn't right! Try again!";
+			email = "";
+		}
 	}
 	pUserBase->set_email(email);
+}
+
+void AdminUser::createUser()
+{
+	uFactory.createNewUser();
 }

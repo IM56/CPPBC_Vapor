@@ -1,7 +1,8 @@
 //C++ Boot Camp - Task 2 - 2018-19 
 //Name: Ismail Movahedi
 //Student number: 28039547
-#pragma once
+#ifndef DATABASE_MANAGER_H
+#define DATABASE_MANAGER_H
 
 #include "Game.h"
 #include "Users.h"
@@ -64,3 +65,4 @@ private:
 
 };
 
+#endif
