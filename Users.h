@@ -10,6 +10,8 @@
 #include "Game.h"
 #include "Wallet.h"
 
+using Username = std::string;
+
 //--
 // UserTypeId represents an identifier for the specific user type.
 //--
@@ -26,8 +28,7 @@ enum class UserTypeId
 class UserBase
 {
 public:
-	using Username = std::string;
-
+	
 	UserBase(const Username& username, const std::string& password, const std::string& email)
 		: m_username(username)
 		, m_password(password)
@@ -91,3 +92,33 @@ public:
 	virtual const UserTypeId get_user_type() const override { return UserTypeId::kAdminUser; }
 };
 
+//--
+// Create an abstract UserBuilder class
+//--
+class UserBuilder
+{
+public:
+	UserBuilder() : pUserBase(nullptr) {}
+	virtual ~UserBuilder();
+
+	virtual void setPassword();
+	virtual void setEmail();
+
+	const UserBase& getUser() { return *pUserBase; }
+
+protected:
+	UserBase* pUserBase;
+};
+
+//----------------
+// Concrete PlayerUserBuilder class
+//----------------
+class PlayerUserBuilder : public UserBuilder
+{
+public:
+	PlayerUserBuilder(const Username& uname) { pUserBase = new PlayerUser(uname, "", ""); }
+
+
+
+	
+};

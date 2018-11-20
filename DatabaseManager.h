@@ -28,7 +28,7 @@ public:
 	void add_user(UserBase* pUser);
 
 	// Finds a user by username, return nullptr if the user is not found.
-	UserBase* find_user(const UserBase::Username& username);
+	UserBase* find_user(const Username& username);
 
 	// iterating users using visitor pattern
 	template<typename Visitor> void visit_users(Visitor& func)
@@ -56,7 +56,7 @@ private:
 
 private:
 	// Types
-	using UserContainer = std::map<UserBase::Username, UserBase*>;
+	using UserContainer = std::map<Username, UserBase*>;
 	using GameContainer = std::map<Game::GameId, Game>;
 
 	UserContainer m_users;
