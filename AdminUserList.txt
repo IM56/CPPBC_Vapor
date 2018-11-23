@@ -1,2 +1,0 @@
-"davem", "12345", "d.r.moore@shu.ac.uk"
-"pascalev", "54321", "p.vacher@shu.ac.uk"
