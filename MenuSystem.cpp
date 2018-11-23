@@ -97,8 +97,8 @@ int MenuSystem::run_player_user_menu()
 	do
 	{
 		std::cout << "Player Menu (" << m_pUser->get_username() << ")\n";
-		std::cout << "Wallet \x9C" << std::setprecision(2) << 
-			pPlayerUser->get_available_funds() << std::fixed << "\n";
+		std::cout << "Wallet \x9C" << std::setprecision(2) << std::fixed <<
+			pPlayerUser->get_available_funds() <<  "\n";
 		std::cout << "(1) List All Games\n";
 		std::cout << "(2) List My Games\n";
 		std::cout << "(3) Buy Game\n";

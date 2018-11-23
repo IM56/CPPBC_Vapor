@@ -1,4 +1,4 @@
-frank , frank12345 , frank@unknown.com
-jake , jake12345 , jake@unknown.com
-andrew , andrew12345 , andrew@unknown.com
-martin , martin12345 , martin@unknown.com
+frank , frank12345 , frank@unknown.com , 15.50
+jake , jake12345 , jake@unknown.com , 8.00
+andrew , andrew12345 , andrew@unknown.com , 12.50
+martin , martin12345 , martin@unknown.com , 10.50
