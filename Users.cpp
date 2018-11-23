@@ -5,6 +5,11 @@
 #include "Users.h"
 #include "DatabaseManager.h"
 
+////////////////////////////////
+// UserBase class implementation
+/////////////////////////////////
+
+
 // ------------------------
 // PlayerUser class implementation
 // ------------------------
@@ -24,6 +29,17 @@ void PlayerUser::add_funds()
 	std::cout << std::setprecision(2) << amount << std::fixed;
 	std::cout << " added to your wallet.\n\n"; 
 }
+
+///////////////////////////////////
+// AdminUser class implementation
+///////////////////////////////////
+
+void AdminUser::createUser()
+{
+	uFactory.createNewUser();
+}
+
+
 
 // -------------------------------
 // UserFactory implementation
@@ -125,11 +141,3 @@ void UserFactory::setEmail()
 	pUserBase->set_email(email);
 }
 
-///////////////////////////////////
-// AdminUser class implementation
-///////////////////////////////////
-
-void AdminUser::createUser()
-{
-	uFactory.createNewUser();
-}

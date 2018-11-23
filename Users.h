@@ -49,7 +49,7 @@ public:
 
 	const std::string get_email() const { return m_email; }
 	void set_email(const std::string& val) { m_email = val; }
-
+	
 private:
 	const Username m_username; // The users username (unique key)
 	std::string m_password; // Users password.
@@ -64,9 +64,11 @@ class PlayerUser : public UserBase
 public:
 	using GameList = std::list<Game::GameId>;
 
-	// inherit the constructor.
 	using UserBase::UserBase;
-	
+
+	PlayerUser(const Username& username, const std::string& password, const std::string& email, double funds) :
+		UserBase(username, password, email), m_wallet(funds) {}
+
 	// define the specific user type.
 	virtual const UserTypeId  get_user_type() const override { return UserTypeId::kPlayerUser; }
 
@@ -94,6 +96,7 @@ public:
 
 	// define the specific user type.
 	virtual const UserTypeId get_user_type() const override { return UserTypeId::kAdminUser; }
+
 
 	void createUser();
 
