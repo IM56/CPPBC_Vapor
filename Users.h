@@ -112,18 +112,15 @@ class UserFactory
 public:
 	UserFactory() : pUserBase(nullptr) {}
 	virtual ~UserFactory(){};
-	/*
-	virtual UserBase* createPlayerUser();
-	virtual UserBase* createAdminUser();
-	*/
-	UserBase* createNewUser();
+	
+	void createNewUser();
 
 private:
 	Username setUsername();
 	void setPassword();
 	void setEmail();
 
-	 std::shared_ptr<UserBase> pUserBase;
+	UserBase* pUserBase;
 };
 
 #endif

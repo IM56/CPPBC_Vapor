@@ -4,10 +4,12 @@
 #ifndef DATABASE_MANAGER_H
 #define DATABASE_MANAGER_H
 
+#include <map>
+#include <fstream>
+#include <sstream>
+
 #include "Game.h"
 #include "Users.h"
-
-#include <map>
 
 //--
 // DatabaseManager is the one central database for the whole system
@@ -18,6 +20,10 @@ class DatabaseManager
 public:
 	// Singleton instance definition.
 	static DatabaseManager& instance();
+
+	// Load data from a file
+	template <typename T>
+	void load_users_from_file(const char* filename);
 
 	// Initialize the database from storage.
 	void load_data();

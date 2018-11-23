@@ -24,12 +24,31 @@ DatabaseManager& DatabaseManager::instance()
 	return s_instance;
 }
 
+template <typename T>
+void DatabaseManager::load_users_from_file(const char* filename)
+{
+	std::string line;
+	std::ifstream file(filename);
+
+	while (std::getline(file, line))
+	{
+		char c;
+		std::string username;
+		std::string password;
+		std::string email;
+		std::istringstream iss(line);
+		iss >> username >> c >> password >> c >> email;
+		add_user(new T(username, password, email));
+	}
+
+}
+
 void DatabaseManager::load_data()
 {
 	// For test purposes I shall populate the database manually here.
 	// In your applications we want you to load data (and save) the contents of the database.
-
-	// add some admin users.
+	
+	/*// add some admin users.
 	add_user(new AdminUser("davem", "12345", "d.r.moore@shu.ac.uk"));
 	add_user(new AdminUser("pascalev", "54321", "p.vacher@shu.ac.uk"));
 
@@ -38,6 +57,9 @@ void DatabaseManager::load_data()
 	add_user(new PlayerUser("jake", "jake12345", "jake@unknown.com"));
 	add_user(new PlayerUser("andrew", "andrew12345", "andrew@unknown.com"));
 	add_user(new PlayerUser("martin", "martin12345", "martin@unknown.com"));
+	*/
+	load_users_from_file<AdminUser>("data\\AdminUserList.txt");
+	load_users_from_file<PlayerUser>("data\\PlayerUserList.txt");
 
 	// add some games.
 	add_game(Game(4789, "Bounceback", "A platform puzzle game for PSP"));

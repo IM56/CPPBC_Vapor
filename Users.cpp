@@ -4,6 +4,7 @@
 
 #include "Users.h"
 #include "DatabaseManager.h"
+
 // ------------------------
 // PlayerUser class implementation
 // ------------------------
@@ -29,29 +30,7 @@ void PlayerUser::add_funds()
 // -------------------------------
 UserFactory AdminUser::uFactory;
 
-/*
-UserBase* UserFactory::createPlayerUser()
-{
-	Username uname = setUsername();
-	pUserBase = new PlayerUser(uname, "", ""); // Create a new player with this username
-	setEmail();								   // Prompt user to provide an email address
-	setPassword();							   // Prompt user to provide a password
-	pdbMan->add_user(pUserBase);			   // Update the database to include the new player user
-	return pUserBase;
-}
-
-UserBase * UserFactory::createAdminUser()
-{
-	Username uname = setUsername();
-	pUserBase = new AdminUser(uname, "", ""); // Create a new admin with this username
-	setEmail();								   // Prompt user to provide an email address
-	setPassword();							   // Prompt user to provide a password
-	pdbMan->add_user(pUserBase);			   // Update the database to include the new admin user
-	return pUserBase;
-}
-*/
-
-UserBase* UserFactory::createNewUser()
+void UserFactory::createNewUser()
 {
 	UserTypeId usertype;
 	std::cout << "\nWhat type of user would you like to create?"
@@ -77,21 +56,21 @@ UserBase* UserFactory::createNewUser()
 	default:
 	{
 		usertype = UserTypeId::kInvalid;
-		return nullptr;
+		pUserBase = nullptr;
+		return;
 	}
 	}
 
 	Username uname = setUsername();
 
 	if (usertype == UserTypeId::kAdminUser)
-		pUserBase = std::make_shared<AdminUser>(AdminUser(uname, "", "")); // Create a new admin with this username
+		pUserBase = new AdminUser(uname, "", ""); // Create a new admin with this username
 	else if (usertype == UserTypeId::kPlayerUser)
-		pUserBase = std::make_shared<PlayerUser>(PlayerUser(uname, "", "")); // Create a new player with this username
+		pUserBase = new PlayerUser(uname, "", ""); // Create a new player with this username
 
 	setEmail();								   // Prompt user to provide an email address
 	setPassword();							   // Prompt user to provide a password
-	DatabaseManager::instance().add_user(pUserBase.get());			   // Update the database to include the new player user
-	return pUserBase.get();
+	DatabaseManager::instance().add_user(pUserBase);			   // Update the database to include the new player user
 }
 
 Username UserFactory::setUsername()
@@ -145,6 +124,10 @@ void UserFactory::setEmail()
 	}
 	pUserBase->set_email(email);
 }
+
+///////////////////////////////////
+// AdminUser class implementation
+///////////////////////////////////
 
 void AdminUser::createUser()
 {
