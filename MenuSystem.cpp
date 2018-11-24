@@ -63,11 +63,12 @@ int MenuSystem::run_admin_user_menu()
 	int result = 0;
 	do
 	{
-		std::cout << "Admin Menu (" << m_pUser->get_username() << ")\n";
+		std::cout << "\nAdmin Menu (" << m_pUser->get_username() << ")\n";
 		std::cout << "(1) List All Games\n";
 		std::cout << "(2) List All Users\n";
 		std::cout << "(3) Add Game\n";
 		std::cout << "(4) Add User\n";
+		std::cout << "(5) Remove User\n";
 		std::cout << "(q) Logout\n";
 
 		char option;
@@ -78,7 +79,8 @@ int MenuSystem::run_admin_user_menu()
 		case '1': list_all_games(); break;
 		case '2': list_all_users(); break;
 		case '3': std::cout << "TODO\n"; break;
-		case '4': pAdminUser->createUser(); break;
+		case '4': pAdminUser->create_user(); break;
+		case '5': pAdminUser->remove_user(); break;
 		case 'q': result = -1; break;
 		default:  std::cout << "INVALID OPTION\n"; break;
 		}
@@ -96,7 +98,7 @@ int MenuSystem::run_player_user_menu()
 	int result = 0;
 	do
 	{
-		std::cout << "Player Menu (" << m_pUser->get_username() << ")\n";
+		std::cout << "\nPlayer Menu (" << m_pUser->get_username() << ")\n";
 		std::cout << "Wallet \x9C" << std::setprecision(2) << std::fixed <<
 			pPlayerUser->get_available_funds() <<  "\n";
 		std::cout << "(1) List All Games\n";

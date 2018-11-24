@@ -5,9 +5,9 @@
 #include "AdminUser.h"
 #include "DatabaseManager.h"
 
-UserFactory AdminUser::uFactory = UserFactory();
+UserFactory AdminUser::m_uFactory = UserFactory();
 
-void AdminUser::createUser()
+void AdminUser::create_user()
 {
 	/////////////////////////////////////////
 	// Find out the type of user to create //
@@ -16,7 +16,7 @@ void AdminUser::createUser()
 	std::cout << "\nWhat type of user would you like to create?"
 		<< "\n(1) Create an admin user"
 		<< "\n(2) Create a player user"
-		<< "\nPress any other key to exit this menu";
+		<< "\nPress any other key to exit this menu\n";
 
 	char option;
 	std::cin >> option;
@@ -94,6 +94,16 @@ void AdminUser::createUser()
 		}
 	}
 
-	uFactory.createNewUser(usertype, uname, password, email);
+	m_uFactory.createNewUser(usertype, uname, password, email);
+}
+
+
+
+void AdminUser::remove_user()
+{
+	std::string uname;
+	std::cout << "\nPlease enter the username you would like to remove: ";
+	std::cin >> uname;
+	DatabaseManager::instance().remove_user(uname);
 }
 

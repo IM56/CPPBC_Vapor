@@ -33,6 +33,9 @@ public:
 	// Adds a user to the db.
 	void add_user(UserBase* pUser);
 
+	// Removes a user from the db.
+	void remove_user(const std::string& username);
+
 	// Finds a user by username, return nullptr if the user is not found.
 	UserBase* find_user(const std::string& username);
 
@@ -65,6 +68,10 @@ private:
 	// Look for user in file
 	bool find_user_in_file(UserBase* pUser, const char* filename);
 
+	// Remove user data from file
+	void remove_user_from_file(UserBase* pUser);
+
+
 private:
 	// Types
 	using UserContainer = std::map<Username, UserBase*>;
@@ -72,7 +79,10 @@ private:
 
 	UserContainer m_users;
 	GameContainer m_games;
-	UserFactory uFactory;
+	UserFactory m_uFactory;
+
+	const char* adminFile = "data\\AdminUserList.txt";
+	const char* playerFile = "data\\PlayerUserList.txt";
 
 };
 

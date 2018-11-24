@@ -2,6 +2,8 @@
 //Name: Ismail Movahedi
 //Student number: 28039547
 
+#include <vector>
+
 #include "DatabaseManager.h"
 
 DatabaseManager::DatabaseManager()
@@ -38,9 +40,6 @@ void DatabaseManager::load_data()
 
 void DatabaseManager::store_user_data(UserBase* pUser)
 {
-	const char* adminFile = "data\\AdminUserList.txt";
-	const char* playerFile = "data\\PlayerUserList.txt";
-
 	if (pUser)
 	{
 		switch (pUser->get_user_type())
@@ -50,9 +49,12 @@ void DatabaseManager::store_user_data(UserBase* pUser)
 			if (!find_user_in_file(pUser, adminFile))
 			{
 				std::ofstream fout(adminFile, std::ios::out | std::ios::app);
+				if (pUser->get_username() != "")
+				{
 					fout << "\n" << pUser->get_username() << " , " <<
-					pUser->get_password() << " , " <<
-					pUser->get_email();
+						pUser->get_password() << " , " <<
+						pUser->get_email();
+				}
 			}
 			break;
 		}
@@ -82,6 +84,20 @@ void DatabaseManager::add_user(UserBase* pUser)
 	{
 		m_users.insert(std::make_pair(pUser->get_username(), pUser));
 	}
+}
+
+void DatabaseManager::remove_user(const std::string & username)
+{
+	UserBase* pUser = find_user(username);
+	if (pUser)
+	{
+		m_users.erase(username);
+		remove_user_from_file(pUser);
+		delete pUser;
+		std::cout << "\nUser <" << username << "> has been erased!\n";
+	}
+	else
+		std::cout << "\nSorry, that username is not our records!\n";
 }
 
 UserBase* DatabaseManager::find_user(const std::string& username)
@@ -131,7 +147,7 @@ void DatabaseManager::load_users_from_file(UserTypeId usertype, const char* file
 		std::istringstream iss(line);
 		iss >> username >> c >> password >> c >> email >> c >> funds;
 
-		uFactory.createNewUser(usertype, username, password, email, funds);
+		m_uFactory.createNewUser(usertype, username, password, email, funds);
 	}
 }
 
@@ -148,4 +164,38 @@ bool DatabaseManager::find_user_in_file(UserBase * pUser, const char* filename)
 			fin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	}
 	return false;
+}
+
+void DatabaseManager::remove_user_from_file(UserBase* pUser)
+{
+	std::string uname = pUser->get_username();
+	std::string line;             
+	const char* filename;
+	std::vector<std::string> file_contents;
+	switch (pUser->get_user_type())       // Identify type of user passed to function
+	{
+	case UserTypeId::kAdminUser :
+	{
+		filename = adminFile; break;
+	}
+	case UserTypeId::kPlayerUser :
+	{
+		filename = playerFile; break;
+	}
+	default: return;
+	}
+
+	std::ifstream fin(filename);              // Open the file containing the user that was passed
+	while (std::getline(fin, line))
+	{
+		if(line.find(uname + " , ") == std::string::npos)
+			file_contents.push_back(line);    // Copy the contents of the file except for the line containing the user
+	}
+
+	if (!file_contents.empty())                // If everything was successfully copied into the vector
+	{
+		std::ofstream fout(filename, std::ios::trunc);
+		for (const auto& ln : file_contents)
+			fout << ln << "\n";                // Put it back in the file
+	}
 }
