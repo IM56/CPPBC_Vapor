@@ -27,8 +27,8 @@ public:
 	// Initialize the database from storage.
 	void load_data();
 
-	// Write all the data to storage.
-	void store_data();
+	// Write data to storage.
+	void store_user_data(UserBase* pUser);
 
 	// Adds a user to the db.
 	void add_user(UserBase* pUser);
@@ -61,6 +61,9 @@ private:
 
 	// Load user data from a file
 	void load_users_from_file(UserTypeId, const char* filename);
+
+	// Look for user in file
+	bool find_user_in_file(UserBase* pUser, const char* filename);
 
 private:
 	// Types
