@@ -62,14 +62,22 @@ void AdminUser::createUser()
 		std::cin >> password;
 		if (password == "")
 			std::cout << "\nSorry, that is not a valid password! Try again!";
+
+		while (verify == "" || verify != password)  // Keep asking for confirmation if incorrect
+		{
+			std::cout << "\nPlease confirm your password: ";
+			std::cin >> verify;
+		
+			if (verify != password)
+			{
+				std::cout << "\n Sorry, those passwords don't match! Try again!";
+				verify.clear();
+				password.clear();
+				break;
+			}
+		}
 	}
-	while (verify == "" || verify != password)  // Keep asking for confirmation if incorrect
-	{
-		std::cout << "\nPlease confirm your password: ";
-		std::cin >> verify;
-		if (verify != password)
-			std::cout << "\n Sorry, those passwords don't match! Try again!";
-	}
+	
 
 	/////////////////////////////////////////////////////
 	// Get and check new email address from user input //

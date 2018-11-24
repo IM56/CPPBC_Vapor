@@ -23,5 +23,6 @@ void UserFactory::createNewUser(UserTypeId usertype, const std::string& username
 		pUserBase = new PlayerUser(username, password, email, funds); // Create a new player with this username
 
 	DatabaseManager::instance().add_user(pUserBase);   // Update the database to include the new user
+	DatabaseManager::instance().store_user_data(pUserBase);
 }
 
