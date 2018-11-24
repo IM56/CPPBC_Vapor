@@ -115,16 +115,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AdminUser.cpp" />
     <ClCompile Include="DatabaseManager.cpp" />
     <ClCompile Include="MainApplication.cpp" />
     <ClCompile Include="MenuSystem.cpp" />
+    <ClCompile Include="PlayerUser.cpp" />
     <ClCompile Include="Users.cpp" />
     <ClCompile Include="Wallet.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AdminUser.h" />
     <ClInclude Include="DatabaseManager.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="MenuSystem.h" />
+    <ClInclude Include="PlayerUser.h" />
     <ClInclude Include="Users.h" />
     <ClInclude Include="Wallet.h" />
   </ItemGroup>

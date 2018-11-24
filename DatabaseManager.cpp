@@ -27,8 +27,8 @@ DatabaseManager& DatabaseManager::instance()
 
 void DatabaseManager::load_data()
 {
-	load_users_from_file<AdminUser>("data\\AdminUserList.txt");
-	load_users_from_file<PlayerUser>("data\\PlayerUserList.txt");
+	load_users_from_file(UserTypeId::kAdminUser, "data\\AdminUserList.txt");
+	load_users_from_file(UserTypeId::kPlayerUser, "data\\PlayerUserList.txt");
 
 	// add some games.
 	add_game(Game(4789, "Bounceback", "A platform puzzle game for PSP"));
@@ -50,7 +50,7 @@ void DatabaseManager::add_user(UserBase* pUser)
 	}
 }
 
-UserBase* DatabaseManager::find_user(const Username& username)
+UserBase* DatabaseManager::find_user(const std::string& username)
 {
 	auto it = m_users.find(username);
 	if (it != m_users.end())
@@ -79,5 +79,24 @@ Game* DatabaseManager::find_game(const Game::GameId gameid)
 	else
 	{
 		return nullptr;
+	}
+}
+
+void DatabaseManager::load_users_from_file(UserTypeId usertype, const char* filename)
+{
+	std::string line;
+	std::ifstream file(filename);
+
+	while (std::getline(file, line))
+	{
+		char c;
+		std::string username;
+		std::string password;
+		std::string email;
+		double funds;
+		std::istringstream iss(line);
+		iss >> username >> c >> password >> c >> email >> c >> funds;
+
+		uFactory.createNewUser(usertype, username, password, email, funds);
 	}
 }

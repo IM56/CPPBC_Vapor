@@ -1,6 +1,7 @@
 //C++ Boot Camp - Task 2 - 2018-19 
 //Name: Ismail Movahedi
 //Student number: 28039547
+#pragma once
 #ifndef DATABASE_MANAGER_H
 #define DATABASE_MANAGER_H
 
@@ -9,8 +10,9 @@
 #include <sstream>
 #include <type_traits>
 
-#include "Game.h"
 #include "Users.h"
+#include "AdminUser.h"
+#include "PlayerUser.h"
 
 //--
 // DatabaseManager is the one central database for the whole system
@@ -32,7 +34,7 @@ public:
 	void add_user(UserBase* pUser);
 
 	// Finds a user by username, return nullptr if the user is not found.
-	UserBase* find_user(const Username& username);
+	UserBase* find_user(const std::string& username);
 
 	// iterating users using visitor pattern
 	template<typename Visitor> void visit_users(Visitor& func)
@@ -58,8 +60,7 @@ private:
 	~DatabaseManager();
 
 	// Load user data from a file
-	template <typename T>
-	void load_users_from_file(const char* filename);
+	void load_users_from_file(UserTypeId, const char* filename);
 
 private:
 	// Types
@@ -68,33 +69,10 @@ private:
 
 	UserContainer m_users;
 	GameContainer m_games;
+	UserFactory uFactory;
 
 };
 
-template <typename T>
-void DatabaseManager::load_users_from_file(const char* filename)
-{
-	std::string line;
-	std::ifstream file(filename);
-
-	while (std::getline(file, line))
-	{
-		char c;
-		std::string username;
-		std::string password;
-		std::string email;
-		double funds;
-		std::istringstream iss(line);
-		iss >> username >> c >> password >> c >> email >> c >> funds;
-		
-		if (std::is_same<T, PlayerUser>::value)
-			add_user(new PlayerUser(username, password, email, funds));
-		else
-			add_user(new T(username, password, email));
-			
-	}
-
-}
 
 
 #endif
