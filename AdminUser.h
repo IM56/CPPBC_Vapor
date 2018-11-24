@@ -22,11 +22,11 @@ public:
 	// define the specific user type.
 	virtual const UserTypeId get_user_type() const override { return UserTypeId::kAdminUser; }
 
-
-	void createUser();
+	void create_user();
+	void remove_user();
 
 private:
-	static UserFactory uFactory;
+	static UserFactory m_uFactory;
 };
 
 #endif
