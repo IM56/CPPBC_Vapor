@@ -2,7 +2,10 @@
 //Name: Ismail Movahedi
 //Student number: 28039547
 
+#include <iomanip>
+
 #include "MenuSystem.h"
+
 
 MenuSystem& MenuSystem::instance()
 {
@@ -21,10 +24,10 @@ void MenuSystem::list_all_games() const
 
 void MenuSystem::list_all_users() const
 {
-	auto userVisitorLambda = [](const UserBase& rUser) {
-		std::cout << rUser.get_username() << " " << rUser.get_email() << "\n";
+	auto userVisitorLambda = [](const UserBase& rUser) 
+	{
+		std::cout << rUser.get_username() << "     " << rUser.get_email() << "\n";
 	};
-
 	DatabaseManager::instance().visit_users(userVisitorLambda);
 }
 
@@ -114,7 +117,7 @@ int MenuSystem::run_player_user_menu()
 		{
 		case '1': list_all_games(); break;
 		case '2': std::cout << "TODO\n"; break;
-		case '3': std::cout << "TODO\n"; break;
+		case '3': pPlayerUser->buy_game(game_menu()); break;
 		case '4': pPlayerUser->add_funds(); break;
 		case 'q': result = -1; break;
 		default:  std::cout << "INVALID OPTION\n"; break;
@@ -150,6 +153,35 @@ int MenuSystem::run_unknown_user_menu()
 
 	return result;
 }
+
+int MenuSystem::game_menu()
+{
+	// user can enter the purchase screen
+	int result = 0;
+
+	std::cout << "\nShop for games\n";
+	std::cout << "(1) Purchase a Title\n";
+	std::cout << "(q) Quit\n";
+
+	char option;
+	std::cin >> option;
+
+	switch (option)
+	{
+	case '1': 
+	{
+		std::cout << "\nPlease enter the ID of the game you would like to purchase: ";
+		std::cin >> result;
+		break;
+	}
+	case 'q': result = -1;  break;
+	default:  std::cout << "INVALID OPTION\n"; break;
+	}
+
+	return result;
+}
+
+
 
 int MenuSystem::run()
 {

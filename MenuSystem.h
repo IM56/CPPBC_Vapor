@@ -36,6 +36,8 @@ private:
 
 	int run_unknown_user_menu();
 
+	int game_menu();
+
 private:
 	UserBase* m_pUser = nullptr;  // the currently logged in user.
 };

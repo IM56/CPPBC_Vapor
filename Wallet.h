@@ -15,7 +15,7 @@ public:
 
 	const double get_available_funds() const { return m_accountFunds; }
 	void deposit(double);
-	void withdraw(double);
+	bool withdraw(double);
 
 private:
 	double m_accountFunds;
