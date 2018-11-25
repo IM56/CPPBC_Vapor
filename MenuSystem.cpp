@@ -6,6 +6,25 @@
 
 #include "MenuSystem.h"
 
+std::ostream& operator<< (std::ostream& os, const UserBase& user)
+{
+	if (user.get_user_type() == UserTypeId::kAdminUser)
+		os << std::left << std::setw(MAX_USERNAME) << "\nAdministrator" << std::setw(3) << "|";
+	else if (user.get_user_type() == UserTypeId::kPlayerUser)
+		os << std::left << std::setw(MAX_USERNAME) << "\nPlayer" << std::setw(3) << "|";
+
+	os << std::setw(MAX_USERNAME) << user.get_username() << std::setw(3) << "|"
+		<< std::setw(2 * MAX_USERNAME) << user.get_email() << std::setw(3) << "|";
+
+	double funds = user.get_available_funds();
+
+	if (funds < 0)
+		os << std::setw(8) << "N/A";
+	else
+		os << "\x9C" << std::setw(7) << std::setprecision(2) << std::fixed << funds;
+
+	return os;
+}
 
 MenuSystem& MenuSystem::instance()
 {
@@ -24,11 +43,17 @@ void MenuSystem::list_all_games() const
 
 void MenuSystem::list_all_users() const
 {
+	std::cout << std::left << std::setw(MAX_USERNAME) << "\nAUTHORITY"
+		<< std::setw(3) << "|" << std::setw(MAX_USERNAME) << "USERNAME" << std::setw(3) << "|"
+		<< std::setw(2 * MAX_USERNAME) << "EMAIL" << std::setw(3) << "|" << std::setw(8) << "FUNDS";
+
 	auto userVisitorLambda = [](const UserBase& rUser) 
 	{
-		std::cout << rUser.get_username() << "     " << rUser.get_email() << "\n";
+		std::cout << rUser;
 	};
 	DatabaseManager::instance().visit_users(userVisitorLambda);
+	
+	std::cout << std::endl;
 }
 
 int MenuSystem::run_login_screen()
@@ -82,8 +107,8 @@ int MenuSystem::run_admin_user_menu()
 		case '1': list_all_games(); break;
 		case '2': list_all_users(); break;
 		case '3': std::cout << "TODO\n"; break;
-		case '4': pAdminUser->create_user(); break;
-		case '5': pAdminUser->remove_user(); break;
+		case '4': create_user(); break;
+		case '5': remove_user(); break;
 		case 'q': result = -1; break;
 		default:  std::cout << "INVALID OPTION\n"; break;
 		}
@@ -152,6 +177,110 @@ int MenuSystem::run_unknown_user_menu()
 	}
 
 	return result;
+}
+
+void MenuSystem::create_user()
+{
+	/////////////////////////////////////////
+	// Find out the type of user to create //
+	/////////////////////////////////////////
+	UserTypeId usertype;
+	std::cout << "\nWhat type of user would you like to create?"
+		<< "\n(1) Create an admin user"
+		<< "\n(2) Create a player user"
+		<< "\nPress any other key to exit this menu\n";
+
+	char option;
+	std::cin >> option;
+
+	switch (option)
+	{
+	case '1':
+	{
+		usertype = UserTypeId::kAdminUser;
+		break;
+	}
+	case '2':
+	{
+		usertype = UserTypeId::kPlayerUser;
+		break;
+	}
+	default:
+		return;
+	}
+
+	//////////////////////////////////////
+	// Get new username from user input //
+	//////////////////////////////////////
+	Username uname;
+	while (uname == "" || uname.length() > MAX_USERNAME)  // Prompt user to input the new username for the account
+	{
+		std::cout << "\nEnter the new username (15 characters or fewer): ";
+		std::cin >> uname;
+
+
+		if (DatabaseManager::instance().find_user(uname))  // Check if the username already exists
+		{
+			std::cout << "\nSorry, the name <" << uname << "> is already taken! Please try again.";
+			uname = "";
+		}
+
+		if (uname.length() > MAX_USERNAME)
+			std::cout << "Sorry, that username was too long. Please try again.";
+	}
+
+	//////////////////////////////////////////////////
+	// Get and confirm new password from user input //
+	//////////////////////////////////////////////////
+	std::string password, verify;
+	while (password == "")   // Prompt user until they provide a password
+	{
+		std::cout << "\nPlease choose a password for your account: ";
+		std::cin >> password;
+		if (password == "")
+			std::cout << "\nSorry, that is not a valid password! Try again!";
+
+		while (verify == "" || verify != password)  // Keep asking for confirmation if incorrect
+		{
+			std::cout << "\nPlease confirm your password: ";
+			std::cin >> verify;
+
+			if (verify != password)
+			{
+				std::cout << "\n Sorry, those passwords don't match! Try again!";
+				verify.clear();
+				password.clear();
+				break;
+			}
+		}
+	}
+
+
+	/////////////////////////////////////////////////////
+	// Get and check new email address from user input //
+	/////////////////////////////////////////////////////
+	std::string email;
+	while (email == "")
+	{
+		std::cout << "\nPlease enter an email address: ";
+		std::cin >> email;
+		if (email == "" || email.find_first_of('@') == std::string::npos || email.find_first_of('@') != email.find_last_of('@'))
+		{
+			std::cout << "\nSorry, that wasn't right! Try again!";
+			email = "";
+		}
+	}
+
+	m_uFactory.createNewUser(usertype, uname, password, email);
+}
+
+
+void MenuSystem::remove_user()
+{
+	std::string uname;
+	std::cout << "\nPlease enter the username you would like to remove: ";
+	std::cin >> uname;
+	DatabaseManager::instance().remove_user(uname);
 }
 
 int MenuSystem::game_menu()

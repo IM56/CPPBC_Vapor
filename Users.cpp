@@ -9,6 +9,10 @@
 // UserBase implementation //
 /////////////////////////////
 
+double UserBase::get_available_funds() const
+{
+	return -1;
+}
 
 
 ////////////////////////////////

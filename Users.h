@@ -13,6 +13,8 @@
 
 using Username = std::string;
 
+constexpr size_t MAX_USERNAME = 15;
+
 //--
 // UserTypeId represents an identifier for the specific user type.
 //--
@@ -40,6 +42,8 @@ public:
 
 	// mechanism for identifying the user type at runtime.
 	virtual const UserTypeId get_user_type() const = 0;
+
+	virtual double get_available_funds() const;
 
 	const std::string get_username() const { return m_username; }
 
@@ -69,7 +73,7 @@ class UserFactory
 public:
 	UserFactory() : pUserBase(nullptr) {}
 	virtual ~UserFactory(){};
-	
+
 	void createNewUser(UserTypeId, const std::string& username, const std::string& password, const std::string& email, double funds = 0.0);
 
 private:

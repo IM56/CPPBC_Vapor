@@ -36,10 +36,15 @@ private:
 
 	int run_unknown_user_menu();
 
+	void create_user();
+
+	void remove_user();
+
 	int game_menu();
 
 private:
 	UserBase* m_pUser = nullptr;  // the currently logged in user.
+	UserFactory m_uFactory;
 };
 
 #endif
