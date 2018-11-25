@@ -24,23 +24,22 @@ public:
 	int run();
 
 private:
-	void list_all_games() const;
 
+	void user_header() const;
+	void game_header() const;
+	void list_all_games() const;
 	void list_all_users() const;
 
 	int run_login_screen();
-
 	int run_admin_user_menu();
-
 	int run_player_user_menu();
-
 	int run_unknown_user_menu();
+	int game_menu();
 
 	void create_user();
-
 	void remove_user();
 
-	int game_menu();
+	
 
 private:
 	UserBase* m_pUser = nullptr;  // the currently logged in user.

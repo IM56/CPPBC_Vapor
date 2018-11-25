@@ -40,7 +40,7 @@ void DatabaseManager::load_data()
 	add_game(Game(5246, "Piecefall", "A tetris like 3d puzzle game for PS4", 5.0));
 }
 
-void DatabaseManager::store_user_data(UserBase* pUser)
+void DatabaseManager::add_user_to_file(UserBase* pUser)
 {
 	if (pUser)
 	{
@@ -48,7 +48,7 @@ void DatabaseManager::store_user_data(UserBase* pUser)
 		{
 		case UserTypeId::kAdminUser :
 		{
-			if (!find_user_in_file(pUser, adminFile))
+			if (!is_user_in_file(pUser, adminFile))
 			{
 				std::ofstream fout(adminFile, std::ios::out | std::ios::app);
 				if (pUser->get_username() != "")
@@ -62,7 +62,7 @@ void DatabaseManager::store_user_data(UserBase* pUser)
 		}
 		case UserTypeId::kPlayerUser :
 		{
-			if (!find_user_in_file(pUser, playerFile))
+			if (!is_user_in_file(pUser, playerFile))
 			{
 				std::ofstream fout(playerFile, std::ios::out | std::ios::app);
 				fout << "\n" << pUser->get_username() << " , " <<
@@ -85,6 +85,7 @@ void DatabaseManager::add_user(UserBase* pUser)
 	if (pUser)
 	{
 		m_users.insert(std::make_pair(pUser->get_username(), pUser));
+		add_user_to_file(pUser);
 	}
 }
 
@@ -106,13 +107,9 @@ UserBase* DatabaseManager::find_user(const std::string& username)
 {
 	auto it = m_users.find(username);
 	if (it != m_users.end())
-	{
 		return it->second;
-	}
 	else
-	{
 		return nullptr;
-	}
 }
 
 
@@ -127,13 +124,9 @@ Game* DatabaseManager::find_game(const Game::GameId gameid)
 {
 	auto it = m_games.find(gameid);
 	if (it != m_games.end())
-	{
 		return &it->second;
-	}
 	else
-	{
 		return nullptr;
-	}
 }
 
 void DatabaseManager::load_users_from_file(UserTypeId usertype, const char* filename)
@@ -155,7 +148,7 @@ void DatabaseManager::load_users_from_file(UserTypeId usertype, const char* file
 	}
 }
 
-bool DatabaseManager::find_user_in_file(UserBase * pUser, const char* filename)
+bool DatabaseManager::is_user_in_file(UserBase * pUser, const char* filename)
 {
 	std::string uname = pUser->get_username();
 	std::string listUname;
@@ -202,4 +195,10 @@ void DatabaseManager::remove_user_from_file(UserBase* pUser)
 		for (const auto& ln : file_contents)
 			fout << ln << "\n";                // Put it back in the file
 	}
+}
+
+void DatabaseManager::update_user_in_file(UserBase * pUser)
+{
+	remove_user_from_file(pUser);
+	add_user_to_file(pUser);
 }

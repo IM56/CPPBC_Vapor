@@ -11,8 +11,6 @@
 //--
 // AdminUser represents a system user who has privileges to modify the system.
 //--
-class UserFactory;
-
 class AdminUser : public UserBase
 {
 public:

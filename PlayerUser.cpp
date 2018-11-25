@@ -11,6 +11,16 @@
 // PlayerUser class implementation
 // ------------------------
 
+void PlayerUser::list_owned_games() const
+{
+	for (auto const& g : m_ownedGames)
+	{
+		Game* pgame = DatabaseManager::instance().find_game(g);
+		if (pgame)
+			std::cout << *pgame << "\n";
+	}
+}
+
 void PlayerUser::add_funds()
 {
 	double amount;
@@ -25,6 +35,9 @@ void PlayerUser::add_funds()
 	std::cout << "Deposit successful! \x9C";
 	std::cout << std::setprecision(2) << amount << std::fixed;
 	std::cout << " added to your wallet.\n\n";
+
+	// Update the files' records of the user
+	DatabaseManager::instance().update_user_in_file(this);
 }
 
 void PlayerUser::buy_game(const Game::GameId game_id)
@@ -47,7 +60,11 @@ void PlayerUser::buy_game(const Game::GameId game_id)
 			{
 				if (m_wallet.withdraw(pgame->get_price()))
 				{
+					// Add the game to the user's list
 					m_ownedGames.push_back(game_id);
+					// Update the files' records of the user
+					DatabaseManager::instance().update_user_in_file(this);
+					// Create a transaction
 					return;
 				}
 			}

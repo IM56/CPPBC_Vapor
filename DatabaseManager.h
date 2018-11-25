@@ -10,9 +10,9 @@
 #include <sstream>
 #include <type_traits>
 
-#include "Users.h"
 #include "AdminUser.h"
 #include "PlayerUser.h"
+#include "Game.h"
 
 //--
 // DatabaseManager is the one central database for the whole system
@@ -28,7 +28,13 @@ public:
 	void load_data();
 
 	// Write data to storage.
-	void store_user_data(UserBase* pUser);
+	void add_user_to_file(UserBase* pUser);
+
+	// Remove user data from file
+	void remove_user_from_file(UserBase* pUser);
+
+	// Update the storage records of the user
+	void update_user_in_file(UserBase* pUser);
 
 	// Adds a user to the db.
 	void add_user(UserBase* pUser);
@@ -67,10 +73,8 @@ private:
 	void load_users_from_file(UserTypeId, const char* filename);
 
 	// Look for user in file
-	bool find_user_in_file(UserBase* pUser, const char* filename);
-
-	// Remove user data from file
-	void remove_user_from_file(UserBase* pUser);
+	bool is_user_in_file(UserBase* pUser, const char* filename);
+	
 
 
 private:

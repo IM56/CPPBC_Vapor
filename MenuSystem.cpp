@@ -6,46 +6,44 @@
 
 #include "MenuSystem.h"
 
-std::ostream& operator<< (std::ostream& os, const UserBase& user)
-{
-	if (user.get_user_type() == UserTypeId::kAdminUser)
-		os << std::left << std::setw(MAX_USERNAME) << "\nAdministrator" << std::setw(3) << "|";
-	else if (user.get_user_type() == UserTypeId::kPlayerUser)
-		os << std::left << std::setw(MAX_USERNAME) << "\nPlayer" << std::setw(3) << "|";
-
-	os << std::setw(MAX_USERNAME) << user.get_username() << std::setw(3) << "|"
-		<< std::setw(2 * MAX_USERNAME) << user.get_email() << std::setw(3) << "|";
-
-	double funds = user.get_available_funds();
-
-	if (funds < 0)
-		os << std::setw(8) << "N/A";
-	else
-		os << "\x9C" << std::setw(7) << std::setprecision(2) << std::fixed << funds;
-
-	return os;
-}
-
 MenuSystem& MenuSystem::instance()
 {
 	static MenuSystem s_instance;
 	return s_instance;
 }
 
+
+
+void MenuSystem::user_header() const
+{
+	std::cout << std::left << std::setw(MAX_USERNAME) << "\nAUTHORITY"
+		<< std::setw(3) << "|" << std::setw(MAX_USERNAME) << "USERNAME" << std::setw(3) << "|"
+		<< std::setw(2 * MAX_USERNAME) << "EMAIL" << std::setw(3) << "|" << std::setw(8) << "FUNDS\n";
+}
+
+void MenuSystem::game_header() const
+{
+	std::cout << std::left << std::setw(6) << "ID" << std::setw(3) << "|"
+		<< std::setw(MAX_GAME_TITLE) << "TITLE" << std::setw(3) << "|"
+		<< std::setw(MAX_DESCRIPTION) << "DESCRIPTION" << std::setw(3) << "|"
+		<< std::setw(8) << "PRICE\n" << std::endl;
+}
+
 void MenuSystem::list_all_games() const
 {
-	auto gameVisitorLambda = [](const Game& rGame) {
-		std::cout << rGame.get_title() << "\n";
-	};
+	game_header();
 
+	auto gameVisitorLambda = [](const Game& rGame) 
+	{
+		std::cout << rGame << "\n";
+	};
 	DatabaseManager::instance().visit_games(gameVisitorLambda);
+	std::cout << std::endl;
 }
 
 void MenuSystem::list_all_users() const
 {
-	std::cout << std::left << std::setw(MAX_USERNAME) << "\nAUTHORITY"
-		<< std::setw(3) << "|" << std::setw(MAX_USERNAME) << "USERNAME" << std::setw(3) << "|"
-		<< std::setw(2 * MAX_USERNAME) << "EMAIL" << std::setw(3) << "|" << std::setw(8) << "FUNDS";
+	user_header();
 
 	auto userVisitorLambda = [](const UserBase& rUser) 
 	{
@@ -141,7 +139,11 @@ int MenuSystem::run_player_user_menu()
 		switch (option)
 		{
 		case '1': list_all_games(); break;
-		case '2': std::cout << "TODO\n"; break;
+		case '2':
+		{
+			game_header();
+			pPlayerUser->list_owned_games(); break;
+		}
 		case '3': pPlayerUser->buy_game(game_menu()); break;
 		case '4': pPlayerUser->add_funds(); break;
 		case 'q': result = -1; break;
@@ -334,3 +336,5 @@ int MenuSystem::run()
 
 	return 0;
 }
+
+
