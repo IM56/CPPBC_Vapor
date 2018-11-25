@@ -39,6 +39,7 @@ public:
 	// Finds a user by username, return nullptr if the user is not found.
 	UserBase* find_user(const std::string& username);
 
+
 	// iterating users using visitor pattern
 	template<typename Visitor> void visit_users(Visitor& func)
 	{

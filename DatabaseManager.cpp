@@ -3,6 +3,8 @@
 //Student number: 28039547
 
 #include <vector>
+#include <algorithm>
+#include <utility>
 
 #include "DatabaseManager.h"
 
@@ -34,8 +36,8 @@ void DatabaseManager::load_data()
 	load_users_from_file(UserTypeId::kPlayerUser, "data\\PlayerUserList.txt");
 
 	// add some games.
-	add_game(Game(4789, "Bounceback", "A platform puzzle game for PSP"));
-	add_game(Game(5246, "Piecefall", "A tetris like 3d puzzle game for PS4"));
+	add_game(Game(4789, "Bounceback", "A platform puzzle game for PSP", 5.0));
+	add_game(Game(5246, "Piecefall", "A tetris like 3d puzzle game for PS4", 5.0));
 }
 
 void DatabaseManager::store_user_data(UserBase* pUser)
@@ -112,6 +114,8 @@ UserBase* DatabaseManager::find_user(const std::string& username)
 		return nullptr;
 	}
 }
+
+
 
 void DatabaseManager::add_game(Game& rGame)
 {

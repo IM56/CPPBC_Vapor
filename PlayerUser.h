@@ -32,6 +32,8 @@ public:
 
 	void add_funds();
 
+	void buy_game(const Game::GameId game);
+
 private:
 	GameList m_ownedGames; // List of owned games.
 	Wallet m_wallet; // The players available funds.

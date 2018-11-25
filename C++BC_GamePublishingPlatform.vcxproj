@@ -117,6 +117,7 @@
   <ItemGroup>
     <ClCompile Include="AdminUser.cpp" />
     <ClCompile Include="DatabaseManager.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="MainApplication.cpp" />
     <ClCompile Include="MenuSystem.cpp" />
     <ClCompile Include="PlayerUser.cpp" />

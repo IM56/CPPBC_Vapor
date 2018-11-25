@@ -2,7 +2,10 @@
 //Name: Ismail Movahedi
 //Student number: 28039547
 
+#include <algorithm>
+
 #include "PlayerUser.h"
+#include "DatabaseManager.h"
 
 // ------------------------
 // PlayerUser class implementation
@@ -22,4 +25,38 @@ void PlayerUser::add_funds()
 	std::cout << "Deposit successful! \x9C";
 	std::cout << std::setprecision(2) << amount << std::fixed;
 	std::cout << " added to your wallet.\n\n";
+}
+
+void PlayerUser::buy_game(const Game::GameId game_id)
+{
+	Game* pgame = DatabaseManager::instance().find_game(game_id);
+	
+	if (pgame)
+	{
+		if ((std::find(m_ownedGames.begin(), m_ownedGames.end(), game_id)) != m_ownedGames.end())
+		{
+			std::cout << "\n You already own the title <" << pgame->get_title() << ">!\n";
+			return;
+		}
+
+		char option;
+		std::cout << "\nWould you like to buy <" << pgame->get_title() << ">? (Y/N) \n";
+		while (std::cin >> option)
+		{
+			if (toupper(option) == 'Y')
+			{
+				if (m_wallet.withdraw(pgame->get_price()))
+				{
+					m_ownedGames.push_back(game_id);
+					return;
+				}
+			}
+			else if (toupper(option) == 'N')
+				return;
+			else
+				std::cout << "Invalid input! Try again. (Y/N) \n";
+		}
+	}
+	else
+		std::cout << "\nSorry, that game is not in our store.";
 }
