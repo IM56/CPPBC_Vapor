@@ -24,22 +24,29 @@ public:
 	int run();
 
 private:
+	// Formatting output of users and games as a table
+	void user_header() const;
+	void game_header() const;
+	
 	void list_all_games() const;
-
 	void list_all_users() const;
 
 	int run_login_screen();
-
 	int run_admin_user_menu();
-
 	int run_player_user_menu();
-
 	int run_unknown_user_menu();
-
 	int game_menu();
+
+	void create_user();
+	void remove_user();
+
+	void add_game();
+	void remove_game();
 
 private:
 	UserBase* m_pUser = nullptr;  // the currently logged in user.
+	UserFactory m_uFactory;
+	GameFactory m_gFactory;
 };
 
 #endif

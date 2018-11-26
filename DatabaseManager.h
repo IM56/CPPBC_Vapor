@@ -8,11 +8,11 @@
 #include <map>
 #include <fstream>
 #include <sstream>
-#include <type_traits>
+#include <vector>
 
-#include "Users.h"
 #include "AdminUser.h"
 #include "PlayerUser.h"
+#include "Game.h"
 
 //--
 // DatabaseManager is the one central database for the whole system
@@ -24,21 +24,33 @@ public:
 	// Singleton instance definition.
 	static DatabaseManager& instance();
 
-	// Initialize the database from storage.
-	void load_data();
+	const char* adminFile = "data\\AdminUserList.txt";
+	const char* playerFile = "data\\PlayerUserList.txt";
+	const char* gameFile = "data\\GameList.txt";
 
-	// Write data to storage.
-	void store_user_data(UserBase* pUser);
+	void load_data(); // Initialize the database from storage.
 
-	// Adds a user to the db.
-	void add_user(UserBase* pUser);
+	void add_user_to_file(UserBase* pUser);        // Add user data to file
+	void remove_user_from_file(UserBase* pUser);   // Remove user data from file
+	void update_user_in_file(UserBase* pUser);     // Update the storage records of the user
+	void add_user(UserBase* pUser);                // Adds a user to files and db manager
+	void remove_user(const std::string& username); // Removes a user from files and db manager
+	
+	void add_game_to_file(Game* pGame);         // Add game data to file
+	void remove_game_from_file(Game* pGame);    // Remove game data from file
+	void update_game_in_file(Game* pGame);      // Update the storage records of the game
+	void add_game(Game* pGame);                // Adds a game to the db.
+	void remove_game(Game::GameId game_id);    // Removes a game from files and db manager
 
-	// Removes a user from the db.
-	void remove_user(const std::string& username);
+	UserBase* find_user(const std::string& username);                       // Finds a username in db, return nullptr if the user is not found.
+	Game* find_game(const Game::GameId gameid);                             // Finds a game in db, returns nullptr if the game is not found.
+	
+	// Look for game in file
+	bool is_game_in_file(Game* pgame, const char* filename);
 
-	// Finds a user by username, return nullptr if the user is not found.
-	UserBase* find_user(const std::string& username);
-
+	// Finds a game in db, return vector of found titles.
+	// (0) to query by title, (1) to query by description
+	std::vector<std::string> find_game(const std::string& query, SearchDescriptor flag, const char* filename);
 
 	// iterating users using visitor pattern
 	template<typename Visitor> void visit_users(Visitor& func)
@@ -46,16 +58,10 @@ public:
 		for (auto it : m_users) { func(*it.second); }
 	}
 
-	// Adds a game to the db.
-	void add_game(Game& rGame);
-
-	// Finds a game by id, returns nullptr if the game is not found.
-	Game* find_game(const Game::GameId gameid);
-
 	// iterating games using visitor pattern
 	template<typename Visitor> void visit_games(Visitor& func)
 	{
-		for (auto it : m_games) { func(it.second); }
+		for (auto it : m_games) { func(*it.second); }
 	}
 
 private:
@@ -66,25 +72,23 @@ private:
 	// Load user data from a file
 	void load_users_from_file(UserTypeId, const char* filename);
 
-	// Look for user in file
-	bool find_user_in_file(UserBase* pUser, const char* filename);
+	void load_games_from_file(const char * filename);
 
-	// Remove user data from file
-	void remove_user_from_file(UserBase* pUser);
+	// Look for user in file
+	bool is_user_in_file(UserBase* pUser, const char* filename);
+
+	
 
 
 private:
 	// Types
 	using UserContainer = std::map<Username, UserBase*>;
-	using GameContainer = std::map<Game::GameId, Game>;
+	using GameContainer = std::map<Game::GameId, Game*>;
 
 	UserContainer m_users;
 	GameContainer m_games;
 	UserFactory m_uFactory;
-
-	const char* adminFile = "data\\AdminUserList.txt";
-	const char* playerFile = "data\\PlayerUserList.txt";
-
+	GameFactory m_gFactory;
 };
 
 

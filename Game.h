@@ -7,6 +7,21 @@
 
 #include <iostream>
 #include <string>
+#include <iomanip>
+#include <memory>
+
+constexpr size_t MAX_GAME_TITLE = 20;
+constexpr size_t MAX_DESCRIPTION = 40;
+
+enum class SearchDescriptor
+{
+	kTitle = 0, 
+	kDesc
+};
+
+////////////////
+// Game class //
+////////////////
 
 class Game
 {
@@ -23,12 +38,12 @@ public:
 	virtual ~Game() {}
 
 	const Game::GameId get_game_id() const { return m_gameId; }
-
 	const std::string get_title() const { return m_title; }
-
+	const std::string get_desc() const { return m_description; }
 	const double get_price() const { return m_price; }
-
-	void set_title(const std::string& val) { m_title = val; }
+	
+	void set_desc(const std::string& desc) { m_description = desc; }
+	void set_title(const std::string& title) { m_title = title; }
 
 private:
 	const GameId m_gameId;	// Numerical identifier for a game  (unique key).
@@ -37,4 +52,21 @@ private:
 	const double m_price;
 };
 
+std::ostream& operator<< (std::ostream& os, const Game& game);
+
+///////////////////////
+// GameFactory class //
+///////////////////////
+
+class GameFactory
+{
+public:
+	GameFactory() : pGame(nullptr) {}
+	virtual ~GameFactory() {};
+
+	void createNewGame(const Game::GameId game_id, const std::string& title, const std::string& desc, const double price);
+
+private:
+	Game* pGame;
+};
 #endif

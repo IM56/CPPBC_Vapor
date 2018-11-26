@@ -11,8 +11,6 @@
 //--
 // AdminUser represents a system user who has privileges to modify the system.
 //--
-class UserFactory;
-
 class AdminUser : public UserBase
 {
 public:
@@ -22,11 +20,8 @@ public:
 	// define the specific user type.
 	virtual const UserTypeId get_user_type() const override { return UserTypeId::kAdminUser; }
 
-	void create_user();
-	void remove_user();
 
 private:
-	static UserFactory m_uFactory;
 };
 
 #endif

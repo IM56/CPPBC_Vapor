@@ -28,7 +28,9 @@ public:
 
 	const PlayerUser::GameList& get_game_list() const { return m_ownedGames; }
 
-	double get_available_funds() const { return m_wallet.get_available_funds(); }
+	void list_owned_games() const;
+
+	virtual double get_available_funds() const override { return m_wallet.get_available_funds(); }
 
 	void add_funds();
 
