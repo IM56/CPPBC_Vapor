@@ -32,3 +32,4 @@ void GameFactory::createNewGame(const Game::GameId game_id, const std::string & 
 	pGame = new Game(game_id, title, desc, price);
 	DatabaseManager::instance().add_game(pGame);
 }
+;
