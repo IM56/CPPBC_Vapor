@@ -16,7 +16,14 @@ DatabaseManager::~DatabaseManager()
 	// We must delete users since we have take ownership.
 	for (auto it : m_users)
 	{
-		if (it.second) delete it.second;
+		if (it.second) 
+			delete it.second;
+	}
+
+	for (auto it : m_games)
+	{
+		if (it.second)
+			delete it.second;
 	}
 }
 
@@ -30,14 +37,13 @@ DatabaseManager& DatabaseManager::instance()
 void DatabaseManager::load_data()
 {
 	// Load admin users from file
-	load_users_from_file(UserTypeId::kAdminUser, "data\\AdminUserList.txt");
+	load_users_from_file(UserTypeId::kAdminUser, adminFile);
 	
 	// Load player users from file
-	load_users_from_file(UserTypeId::kPlayerUser, "data\\PlayerUserList.txt");
+	load_users_from_file(UserTypeId::kPlayerUser, playerFile);
 
-	// add some games.
-	add_game(Game(4789, "Bounceback", "A platform puzzle game for PSP", 5.0));
-	add_game(Game(5246, "Piecefall", "A tetris like 3d puzzle game for PS4", 5.0));
+	// Load games from file
+	load_games_from_file(gameFile);
 }
 
 void DatabaseManager::add_user_to_file(UserBase* pUser)
@@ -78,6 +84,46 @@ void DatabaseManager::add_user_to_file(UserBase* pUser)
 	}
 }
 
+void DatabaseManager::remove_user_from_file(UserBase* pUser)
+{
+	std::string uname = pUser->get_username();
+	std::string line;
+	const char* filename;
+	std::vector<std::string> file_contents;
+	switch (pUser->get_user_type())       // Identify type of user passed to function
+	{
+	case UserTypeId::kAdminUser:
+	{
+		filename = adminFile; break;
+	}
+	case UserTypeId::kPlayerUser:
+	{
+		filename = playerFile; break;
+	}
+	default: return;
+	}
+
+	std::ifstream fin(filename);              // Open the file containing the user that was passed
+	while (std::getline(fin, line))
+	{
+		if (line.find(uname + " , ") == std::string::npos)
+			file_contents.push_back(line);    // Copy the contents of the file except for the line containing the user
+	}
+
+	if (!file_contents.empty())                // If everything was successfully copied into the vector
+	{
+		std::ofstream fout(filename, std::ios::trunc);
+		for (const auto& ln : file_contents)
+			fout << ln << "\n";                // Put it back in the file
+	}
+}
+
+void DatabaseManager::update_user_in_file(UserBase * pUser)
+{
+	remove_user_from_file(pUser);
+	add_user_to_file(pUser);
+}
+
 void DatabaseManager::add_user(UserBase* pUser)
 {
 	// Store the user instance in the user map, indexed by username.
@@ -103,6 +149,76 @@ void DatabaseManager::remove_user(const std::string & username)
 		std::cout << "\nSorry, that username is not our records!\n";
 }
 
+void DatabaseManager::add_game_to_file(Game* pGame)
+{
+	if (pGame)
+	{
+		if (!is_game_in_file(pGame, gameFile))
+		{
+			std::ofstream fout(gameFile, std::ios::out | std::ios::app);
+			if (pGame->get_game_id() > 0)
+			{
+				fout << "\n" << pGame->get_game_id() << " , " <<
+					pGame->get_title() << " , " <<
+					pGame->get_desc() << " , " <<
+					pGame->get_price();
+			}
+		}
+	}
+}
+
+void DatabaseManager::remove_game_from_file(Game* pGame)
+{
+
+	Game::GameId game_id = pGame->get_game_id();
+	Game::GameId num;
+	std::string line;
+	std::vector<std::string> file_contents;
+	
+	std::ifstream fin(gameFile);              // Open the game file
+	while (std::getline(fin, line))
+	{
+		std::istringstream iss(line);
+		iss >> num;
+		if (num != game_id)
+			file_contents.push_back(line);    // Copy the contents of the file except for the line containing the game
+	}
+
+	if (!file_contents.empty())                // If everything was successfully copied into the vector
+	{
+		std::ofstream fout(gameFile, std::ios::trunc);
+		for (const auto& ln : file_contents)
+			fout << ln << "\n";                // Put it back in the file
+	}
+}
+
+void DatabaseManager::update_game_in_file(Game* pGame)
+{
+	remove_game_from_file(pGame);
+	add_game_to_file(pGame);
+}
+
+void DatabaseManager::add_game(Game* pGame)
+{
+	m_games.insert(std::make_pair(pGame->get_game_id(), pGame));
+	add_game_to_file(pGame);
+}
+
+void DatabaseManager::remove_game(Game::GameId game_id)
+{
+	Game* pGame = find_game(game_id);
+	if (pGame)
+	{
+		std::string title = pGame->get_title();
+		m_games.erase(game_id);
+		remove_game_from_file(pGame);
+		delete pGame;
+		std::cout << "\nGame <" << title << "> has been erased!\n";
+	}
+	else
+		std::cout << "\nSorry, that game is not our records!\n";
+}
+
 UserBase* DatabaseManager::find_user(const std::string& username)
 {
 	auto it = m_users.find(username);
@@ -112,22 +228,53 @@ UserBase* DatabaseManager::find_user(const std::string& username)
 		return nullptr;
 }
 
-
-
-void DatabaseManager::add_game(Game& rGame)
-{
-	// Store the game indexed by game id.
-	m_games.insert(std::make_pair(rGame.get_game_id(), rGame));
-}
-
 Game* DatabaseManager::find_game(const Game::GameId gameid)
 {
 	auto it = m_games.find(gameid);
 	if (it != m_games.end())
-		return &it->second;
+		return it->second;
 	else
 		return nullptr;
 }
+
+std::vector<std::string> DatabaseManager::find_game(const std::string & query, SearchDescriptor flag, const char* filename)
+{
+	std::vector<std::string> found_titles;
+	std::string title, desc_word, line;
+	Game::GameId id;
+	char c;
+
+	std::ifstream fin(filename);     // Open file for reading
+	while (std::getline(fin, line))  // While there are files to read
+	{
+		std::istringstream iss(line);
+		if ((iss>>id) && (iss>>c) && std::getline(iss, title, ','))
+		{
+			title = title.substr(1, title.length() - 2);
+			if (flag == SearchDescriptor::kTitle)  // If we are looking for a title...
+			{
+				if (query == title)  // If our title is in there
+				{
+					found_titles.push_back(title);    // ... add it to our matching titles
+				}
+			}
+			else if (flag == SearchDescriptor::kDesc) // If we are looking for a description...
+			{
+				do
+				{
+					iss >> desc_word;                        // Read along the descriptive text
+					if (desc_word.find(',') != std::string::npos) // until we hit a (delimiting) comma
+						break;
+					if (desc_word == query)   // If a word in the description matches our query
+						found_titles.push_back(title); // add it to our matching titles
+				} while (desc_word.find(',') == std::string::npos);
+			}
+		}
+		
+	}
+	return found_titles;
+}
+
 
 void DatabaseManager::load_users_from_file(UserTypeId usertype, const char* filename)
 {
@@ -148,6 +295,28 @@ void DatabaseManager::load_users_from_file(UserTypeId usertype, const char* file
 	}
 }
 
+void DatabaseManager::load_games_from_file(const char * filename)
+{
+	std::string line;
+	std::ifstream file(filename);
+	char c;
+	Game::GameId game_id;
+	std::string title;
+	std::string desc;
+	double price;
+
+	while (std::getline(file, line))
+	{
+		std::istringstream iss(line);
+		if ((iss >> game_id) && (iss >> c) && std::getline(iss, title, ',')
+			&& std::getline(iss, desc, ',') && (iss >> price))
+		{
+			m_gFactory.createNewGame(game_id, title, desc, price);
+		}
+	}
+}
+
+
 bool DatabaseManager::is_user_in_file(UserBase * pUser, const char* filename)
 {
 	std::string uname = pUser->get_username();
@@ -163,42 +332,21 @@ bool DatabaseManager::is_user_in_file(UserBase * pUser, const char* filename)
 	return false;
 }
 
-void DatabaseManager::remove_user_from_file(UserBase* pUser)
+bool DatabaseManager::is_game_in_file(Game* pgame, const char * filename)
 {
-	std::string uname = pUser->get_username();
-	std::string line;             
-	const char* filename;
-	std::vector<std::string> file_contents;
-	switch (pUser->get_user_type())       // Identify type of user passed to function
+	Game::GameId game_id = pgame->get_game_id();
+	Game::GameId file_game_id;
+	std::ifstream fin(filename);
+	while (fin >> file_game_id)
 	{
-	case UserTypeId::kAdminUser :
-	{
-		filename = adminFile; break;
+		if (file_game_id == game_id)
+			return true;
+		else
+			fin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	}
-	case UserTypeId::kPlayerUser :
-	{
-		filename = playerFile; break;
-	}
-	default: return;
-	}
-
-	std::ifstream fin(filename);              // Open the file containing the user that was passed
-	while (std::getline(fin, line))
-	{
-		if(line.find(uname + " , ") == std::string::npos)
-			file_contents.push_back(line);    // Copy the contents of the file except for the line containing the user
-	}
-
-	if (!file_contents.empty())                // If everything was successfully copied into the vector
-	{
-		std::ofstream fout(filename, std::ios::trunc);
-		for (const auto& ln : file_contents)
-			fout << ln << "\n";                // Put it back in the file
-	}
+	return false;
 }
 
-void DatabaseManager::update_user_in_file(UserBase * pUser)
-{
-	remove_user_from_file(pUser);
-	add_user_to_file(pUser);
-}
+
+
+

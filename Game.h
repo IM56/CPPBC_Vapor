@@ -8,9 +8,20 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
+#include <memory>
 
 constexpr size_t MAX_GAME_TITLE = 20;
 constexpr size_t MAX_DESCRIPTION = 40;
+
+enum class SearchDescriptor
+{
+	kTitle = 0, 
+	kDesc
+};
+
+////////////////
+// Game class //
+////////////////
 
 class Game
 {
@@ -43,4 +54,19 @@ private:
 
 std::ostream& operator<< (std::ostream& os, const Game& game);
 
+///////////////////////
+// GameFactory class //
+///////////////////////
+
+class GameFactory
+{
+public:
+	GameFactory() : pGame(nullptr) {}
+	virtual ~GameFactory() {};
+
+	void createNewGame(const Game::GameId game_id, const std::string& title, const std::string& desc, const double price);
+
+private:
+	Game* pGame;
+};
 #endif

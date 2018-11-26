@@ -6,13 +6,12 @@
 
 #include "MenuSystem.h"
 
+
 MenuSystem& MenuSystem::instance()
 {
 	static MenuSystem s_instance;
 	return s_instance;
 }
-
-
 
 void MenuSystem::user_header() const
 {
@@ -93,8 +92,9 @@ int MenuSystem::run_admin_user_menu()
 		std::cout << "(1) List All Games\n";
 		std::cout << "(2) List All Users\n";
 		std::cout << "(3) Add Game\n";
-		std::cout << "(4) Add User\n";
-		std::cout << "(5) Remove User\n";
+		std::cout << "(4) Remove Game\n";
+		std::cout << "(5) Add User\n";
+		std::cout << "(6) Remove User\n";
 		std::cout << "(q) Logout\n";
 
 		char option;
@@ -104,9 +104,10 @@ int MenuSystem::run_admin_user_menu()
 		{
 		case '1': list_all_games(); break;
 		case '2': list_all_users(); break;
-		case '3': std::cout << "TODO\n"; break;
-		case '4': create_user(); break;
-		case '5': remove_user(); break;
+		case '3': add_game(); break;
+		case '4': remove_game(); break;
+		case '5': create_user(); break;
+		case '6': remove_user(); break;
 		case 'q': result = -1; break;
 		default:  std::cout << "INVALID OPTION\n"; break;
 		}
@@ -283,6 +284,127 @@ void MenuSystem::remove_user()
 	std::cout << "\nPlease enter the username you would like to remove: ";
 	std::cin >> uname;
 	DatabaseManager::instance().remove_user(uname);
+}
+
+void MenuSystem::add_game()
+{
+	/////////////////////////////////
+	// Get Game ID from user input //
+	/////////////////////////////////
+	Game::GameId game_id;
+	std::string title;
+	std::string description;
+	double price;
+
+	do
+	{
+		std::cout << "\nEnter a unique 4-digit ID number for the new game: ";
+		std::cin >> game_id;
+
+		if (!std::cin) // If there was bad input
+		{
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			game_id = -1;
+		}
+
+		else if (game_id < 0 || game_id > 9999)
+			std::cout << "\nSorry, that was not a valid ID number! Please try again.";
+
+		else if (DatabaseManager::instance().find_game(game_id))
+		{
+			std::cout << "\nSorry, that ID number is already taken! Please try again.";
+			game_id = -1;
+		}
+	} while (game_id < 0 || game_id > 9999); // ID must be 4 digits long
+
+	std::cin.clear();
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+	////////////////////////////////////
+	// Get Game title from user input //
+	////////////////////////////////////
+
+	do // Prompt user to input the new (non-empty) title
+	{
+		std::cout << "\nEnter the new game's title (20 characters or fewer, no commas): ";
+		std::getline(std::cin, title);
+
+		if (title.find(',') != std::string::npos)
+		{
+			std::cout << "\nPlease don't put commas in the title. Try again.";
+			title.clear();
+		}
+
+		if (title.length() > MAX_GAME_TITLE)
+		{
+			std::cout << "\nThat title was too long. Try again.";
+			title.clear();
+		}
+
+		std::vector<std::string> matching_titles = DatabaseManager::instance().find_game(title, SearchDescriptor::kTitle, DatabaseManager::instance().gameFile);
+
+		if (!matching_titles.empty())
+		{
+			std::cout << "\nSorry, that title already exists. Try again.";
+			title.clear();
+		}
+
+	} while (title == "");
+
+	
+	////////////////////////////////////////////
+	// Get game's description from user input //
+	////////////////////////////////////////////
+	do // Prompt user to input the new (non-empty) description
+	{
+		std::cout << "\nEnter the new game's description (40 characters or fewer, no commas): ";
+		std::getline(std::cin, description);
+
+		if (description.find(',') != std::string::npos)
+		{
+			std::cout << "\nPlease don't put commas in the description. Try again.";
+			description.clear();
+		}
+
+		if (description.length() > MAX_DESCRIPTION)
+		{
+			std::cout << "\nThat description was too long. Try again.";
+			description.clear();
+		}
+
+	} while (description == "");
+
+
+	//////////////////////////////////////
+	// Get game's price from user input //
+	//////////////////////////////////////
+	do
+	{
+		std::cout << "\nPlease enter a price for the game (pounds.pence): ";
+		std::cin >> price;
+
+		if (!std::cin) // If there was bad input
+		{
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			game_id = -1;
+		}
+
+		if (price < 0)
+			std::cout << "\nSorry, that wasn't a vaild price. Please try again: ";
+	} while (price < 0);
+
+
+	m_gFactory.createNewGame(game_id, title, description, price);
+}
+
+void MenuSystem::remove_game()
+{
+	Game::GameId game_id;
+	std::cout << "\nPlease enter the id of the game you would like to remove: ";
+	std::cin >> game_id;
+	DatabaseManager::instance().remove_game(game_id);
 }
 
 int MenuSystem::game_menu()
