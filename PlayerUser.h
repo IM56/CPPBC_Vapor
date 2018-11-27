@@ -44,9 +44,11 @@ public:
 
 	std::string get_game_file() { return m_game_bag; }
 
-	void buy_game(const Game::GameId game);
+	void buy_game(const Game::GameId game_id);
+	void play_game(const Game::GameId game_id);
 
-	bool owns_game(const Game::GameId game);
+	bool owns_game(const Game::GameId game_id);
+	bool empty_bag();
 
 private:
 	GameList m_ownedGames; // List of owned games.

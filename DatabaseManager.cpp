@@ -61,7 +61,7 @@ void DatabaseManager::add_user_to_file(UserBase* pUser)
 				std::ofstream fout(adminFile, std::ios::out | std::ios::app);
 				if (fout && !pUser->get_username().empty())
 				{
-					fout << "\n" << pUser->get_username() << " , " <<
+					fout << pUser->get_username() << " , " <<
 						pUser->get_password() << " , " <<
 						pUser->get_email();
 				}
@@ -120,7 +120,8 @@ void DatabaseManager::remove_user_from_file(UserBase* pUser)
 	{
 		std::ofstream fout(filename, std::ios::trunc);
 		for (const auto& ln : file_contents)
-			fout << ln << "\n";                // Put it back in the file
+			if(!ln.empty())
+				fout << ln << "\n";                // Put it back in the file
 	}
 }
 
@@ -171,7 +172,7 @@ void DatabaseManager::add_game_to_file(Game* pGame)
 			std::ofstream fout(gameFile, std::ios::out | std::ios::app);
 			if (pGame->get_game_id() > 0)
 			{
-				fout << "\n" << pGame->get_game_id() << " , " <<
+				fout << pGame->get_game_id() << " , " <<
 					pGame->get_title() << " , " <<
 					pGame->get_desc() << " , " <<
 					pGame->get_price();
@@ -405,7 +406,6 @@ void DatabaseManager::load_game_bag_from_file(PlayerUser * pPlayer)
 {
 	Game::GameId game_id;
 	std::string line;
-	char c;
 	std::string game_file = pPlayer->get_game_file();
 	std::ifstream fin(game_file);
 	if (fin)

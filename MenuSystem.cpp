@@ -130,7 +130,9 @@ int MenuSystem::run_player_user_menu()
 		std::cout << "(1) List All Games\n";
 		std::cout << "(2) List My Games\n";
 		std::cout << "(3) Buy Game\n";
-		std::cout << "(4) Add Funds\n";
+		std::cout << "(4) Play Game\n";
+		std::cout << "(5) Delete Game\n";
+		std::cout << "(6) Add Funds\n";
 		std::cout << "(q) Logout\n";
 
 		char option;
@@ -141,11 +143,19 @@ int MenuSystem::run_player_user_menu()
 		case '1': list_all_games(); break;
 		case '2':
 		{
-			game_header();
-			pPlayerUser->list_owned_games(); break;
+			if (pPlayerUser->empty_bag())
+				std::cout << "\nYou don't own any games yet!\n";
+			else
+			{
+				game_header();
+				pPlayerUser->list_owned_games();
+			}
+			break;
 		}
 		case '3': pPlayerUser->buy_game(game_menu()); break;
-		case '4': pPlayerUser->add_funds(); break;
+		case '4': play_game(pPlayerUser); break;
+		case '5': delete_game(pPlayerUser); break;
+		case '6': pPlayerUser->add_funds(); break;
 		case 'q': result = -1; break;
 		default:  std::cout << "INVALID OPTION\n"; break;
 		}
@@ -398,10 +408,54 @@ Game* MenuSystem::create_game()
 	return m_gFactory.createNewGame(game_id, title, description, price);
 }
 
+void MenuSystem::play_game(PlayerUser * pPlayer)
+{
+	Game::GameId game_id;
+	std::string input;
+	if (pPlayer->empty_bag())
+	{
+		std::cout << "\nYou don't own any games yet!\n";
+		return;
+	}
+	std::cout << "\nWhich game would you like to play?" << std::endl;
+	while (input == "")
+	{
+		game_header();
+		pPlayer->list_owned_games();
+		std::cout << "\nPlease enter the ID of the game you would like to play, or press (Q) to quit: ";
+		std::cin >> input;
+		if (std::cin)
+		{
+			std::istringstream iss(input);
+			if (input == "Q" || input == "q")
+				return;
+			else if (iss >> game_id && DatabaseManager::instance().find_game(game_id))
+			{
+				if (pPlayer->owns_game(game_id))
+				{
+					pPlayer->play_game(game_id);
+					return;
+				}
+				else
+				{
+					std::cout << "\nThat's not a game in your bag... Try again!";
+					input.clear();
+				}
+			}
+			else
+			{
+				std::cout << "\nSomething wasn't right there... Try again!";
+				input.clear();
+			}
+		}
+	}
+	
+}
+
 void MenuSystem::remove_game()
 {
 	Game::GameId game_id;
-	std::cout << "\nPlease enter the id of the game you would like to remove: ";
+	std::cout << "\nPlease enter the ID of the game you would like to remove: ";
 	std::cin >> game_id;
 	std::vector<PlayerUser*> owners = DatabaseManager::instance().find_users_who_own_game(game_id);
 	for (auto& o : owners)
@@ -440,6 +494,38 @@ void MenuSystem::remove_game()
 	DatabaseManager::instance().remove_game(game_id); // Remove the game from the master list
 }
 
+void MenuSystem::delete_game(PlayerUser * pPlayer)
+{
+	Game::GameId game_id;
+	if (pPlayer->empty_bag())
+	{
+		std::cout << "\nYou don't own any games yet!\n";
+		return;
+	}
+	else
+	{
+		std::cout << "\nEnter the ID of the game you would like to remove: ";
+		std::cin >> game_id;
+		if (std::cin)
+		{
+			Game* pGame = DatabaseManager::instance().find_game(game_id);
+			if (pPlayer->owns_game(game_id))
+			{
+				pPlayer->remove_from_game_list(game_id);
+				DatabaseManager::instance().remove_game_from_bag(game_id, pPlayer);
+				std::cout << "<" << pGame->get_title() << "> deleted from your account.";
+				return;
+			}
+			else
+			{
+				std::cout << "\nYou don't own <" << pGame->get_title() << ">!\n";
+				return;
+			}
+				
+		}
+	}	
+}
+
 int MenuSystem::game_menu()
 {
 	// user can enter the purchase screen
@@ -456,6 +542,7 @@ int MenuSystem::game_menu()
 	{
 	case '1': 
 	{
+		list_all_games();
 		std::cout << "\nPlease enter the ID of the game you would like to purchase: ";
 		std::cin >> result;
 		break;
