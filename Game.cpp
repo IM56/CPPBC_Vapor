@@ -27,8 +27,9 @@ std::ostream& operator<< (std::ostream& os, const Game& game)
 // GameFactory class implementation //
 //////////////////////////////////////
 
-void GameFactory::createNewGame(const Game::GameId game_id, const std::string & title, const std::string & desc, const double price)
+Game* GameFactory::createNewGame(const Game::GameId game_id, const std::string & title, const std::string & desc, const double price)
 {
 	pGame = new Game(game_id, title, desc, price);
-	DatabaseManager::instance().add_game(pGame);
+	DatabaseManager::instance().create_game(pGame);
+	return pGame;
 }

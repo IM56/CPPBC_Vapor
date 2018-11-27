@@ -38,12 +38,16 @@ public:
 	
 	void add_game_to_file(Game* pGame);         // Add game data to file
 	void remove_game_from_file(Game* pGame);    // Remove game data from file
+	void remove_game_from_bag(Game::GameId game_id, PlayerUser* pPlayer); // Removes a game from a player's bag file
 	void update_game_in_file(Game* pGame);      // Update the storage records of the game
-	void add_game(Game* pGame);                // Adds a game to the db.
+	void create_game(Game* pGame);                // Adds a game to the db.
 	void remove_game(Game::GameId game_id);    // Removes a game from files and db manager
+	void add_game_to_bag(Game::GameId game_id, PlayerUser* pPlayer); // Adds a game to a user's bag file
+	
 
 	UserBase* find_user(const std::string& username);                       // Finds a username in db, return nullptr if the user is not found.
 	Game* find_game(const Game::GameId gameid);                             // Finds a game in db, returns nullptr if the game is not found.
+	std::vector<PlayerUser*> find_users_who_own_game(const Game::GameId game_id); // Returns a vector of players who own a given game.
 	
 	// Look for game in file
 	bool is_game_in_file(Game* pgame, const char* filename);
@@ -53,13 +57,31 @@ public:
 	std::vector<std::string> find_game(const std::string& query, SearchDescriptor flag, const char* filename);
 
 	// iterating users using visitor pattern
-	template<typename Visitor> void visit_users(Visitor& func)
+	template<typename Visitor> 
+	void visit_users(Visitor& func)
 	{
 		for (auto it : m_users) { func(*it.second); }
 	}
 
+	// iterating players using visitor pattern
+	template<typename Visitor> 
+	void visit_players(Visitor& func)
+	{
+		for (auto& it : m_users)
+		{
+			UserBase* pUser = it.second;
+			if (pUser->get_user_type() == UserTypeId::kPlayerUser)
+			{
+				PlayerUser* pPlayer = static_cast<PlayerUser*>(it.second);
+				func(pPlayer);
+			}
+		}
+	}
+	
+
 	// iterating games using visitor pattern
-	template<typename Visitor> void visit_games(Visitor& func)
+	template<typename Visitor> 
+	void visit_games(Visitor& func)
 	{
 		for (auto it : m_games) { func(*it.second); }
 	}
@@ -72,7 +94,14 @@ private:
 	// Load user data from a file
 	void load_users_from_file(UserTypeId, const char* filename);
 
+	// Load all available games from file
 	void load_games_from_file(const char * filename);
+
+	// Load a user's games from their file
+	void load_game_bag_from_file(PlayerUser* pPlayer);
+
+	//Load each player user's games from their file
+	void load_games_each_player();
 
 	// Look for user in file
 	bool is_user_in_file(UserBase* pUser, const char* filename);

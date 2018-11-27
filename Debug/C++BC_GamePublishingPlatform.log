@@ -1,2 +1,3 @@
-﻿  Game.cpp
+﻿  DatabaseManager.cpp
+c:\users\bear\documents\assignment 2\vapor\cppbc_vapor\databasemanager.cpp(402): warning C4101: 'c': unreferenced local variable
   C++BC_GamePublishingPlatform.vcxproj -> C:\Users\Bear\Documents\Assignment 2\Vapor\CPPBC_Vapor\Debug\C++BC_GamePublishingPlatform.exe

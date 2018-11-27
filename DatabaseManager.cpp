@@ -44,6 +44,9 @@ void DatabaseManager::load_data()
 
 	// Load games from file
 	load_games_from_file(gameFile);
+
+	// Load each user's currently owned games
+	load_games_each_player();
 }
 
 void DatabaseManager::add_user_to_file(UserBase* pUser)
@@ -57,7 +60,7 @@ void DatabaseManager::add_user_to_file(UserBase* pUser)
 			if (!is_user_in_file(pUser, adminFile))
 			{
 				std::ofstream fout(adminFile, std::ios::out | std::ios::app);
-				if (pUser->get_username() != "")
+				if (fout && !pUser->get_username().empty())
 				{
 					fout << "\n" << pUser->get_username() << " , " <<
 						pUser->get_password() << " , " <<
@@ -71,10 +74,14 @@ void DatabaseManager::add_user_to_file(UserBase* pUser)
 			if (!is_user_in_file(pUser, playerFile))
 			{
 				std::ofstream fout(playerFile, std::ios::out | std::ios::app);
-				fout << "\n" << pUser->get_username() << " , " <<
-					pUser->get_password() << " , " <<
-					pUser->get_email() << " , " <<
-					static_cast<PlayerUser*>(pUser)->get_available_funds();
+				if (fout && !pUser->get_username().empty())
+				{
+					fout << "\n" << pUser->get_username() << " , " <<
+						pUser->get_password() << " , " <<
+						pUser->get_email() << " , " <<
+						static_cast<PlayerUser*>(pUser)->get_available_funds();
+				}
+				
 			}
 			break;
 		}
@@ -175,22 +182,67 @@ void DatabaseManager::remove_game_from_file(Game* pGame)
 	std::string line;
 	std::vector<std::string> file_contents;
 	
-	std::ifstream fin(gameFile);              // Open the game file
-	while (std::getline(fin, line))
+	std::ifstream fin(gameFile);  // Open the game file
+	if (fin)
 	{
-		std::istringstream iss(line);
-		iss >> num;
-		if (num != game_id)
-			file_contents.push_back(line);    // Copy the contents of the file except for the line containing the game
-	}
+		while (std::getline(fin, line))
+		{
+			std::istringstream iss(line);
+			iss >> num;
+			if (num != game_id)
+				file_contents.push_back(line);    // Copy the contents of the file except for the line containing the game
+		}
 
-	if (!file_contents.empty())                // If everything was successfully copied into the vector
-	{
-		std::ofstream fout(gameFile, std::ios::trunc);
-		for (const auto& ln : file_contents)
-			fout << ln << "\n";                // Put it back in the file
+		if (!file_contents.empty())                // If everything was successfully copied into the vector
+		{
+			std::ofstream fout(gameFile, std::ios::trunc);
+			if (fout)
+			{
+				for (const auto& ln : file_contents)
+					fout << ln << "\n";                // Put it back in the file
+			}
+			else
+				std::cout << "\nError: Could not open list of games for writing!";
+		}
 	}
+	else
+		std::cout << "\nError: Could not open list of games for reading!";
+	
 }
+
+void DatabaseManager::remove_game_from_bag(Game::GameId game_id, PlayerUser * pPlayer)
+{
+	Game::GameId num;
+	std::string line;
+	std::vector<std::string> file_contents;
+	
+	std::ifstream fin(pPlayer->get_game_file());
+	if (fin)
+	{
+		while (std::getline(fin, line))
+		{
+			std::istringstream iss(line);
+			iss >> num;
+			if (num != game_id)
+				file_contents.push_back(line);    // Copy the contents of the file except for the line containing the game
+		}
+
+		if (!file_contents.empty())                // If everything was successfully copied into the vector
+		{
+			std::ofstream fout(pPlayer->get_game_file(), std::ios::trunc);
+			if (fout)
+			{
+				for (const auto& ln : file_contents)
+					fout << ln << "\n";                // Put it back in the file
+			}
+			else
+				std::cout << "\nError: Could not open <" << pPlayer->get_username() << ">'s bag file for writing!";
+		}
+	}
+	else
+		std::cout << "\nError: Could not open <" << pPlayer->get_username() << ">'s bag file for reading!";
+}
+
 
 void DatabaseManager::update_game_in_file(Game* pGame)
 {
@@ -198,10 +250,14 @@ void DatabaseManager::update_game_in_file(Game* pGame)
 	add_game_to_file(pGame);
 }
 
-void DatabaseManager::add_game(Game* pGame)
+void DatabaseManager::create_game(Game* pGame)
 {
-	m_games.insert(std::make_pair(pGame->get_game_id(), pGame));
-	add_game_to_file(pGame);
+	if (pGame)
+	{
+		m_games.insert(std::make_pair(pGame->get_game_id(), pGame));
+		add_game_to_file(pGame);
+	}
+	else return;
 }
 
 void DatabaseManager::remove_game(Game::GameId game_id)
@@ -217,6 +273,17 @@ void DatabaseManager::remove_game(Game::GameId game_id)
 	}
 	else
 		std::cout << "\nSorry, that game is not our records!\n";
+}
+
+void DatabaseManager::add_game_to_bag(Game::GameId game_id, PlayerUser * pPlayer)
+{
+	std::ofstream fout(pPlayer->get_game_file(), std::ios::out | std::ios::app);
+	if (fout)
+	{
+		fout << game_id << ",\n";
+	}
+	else
+		std::cout << "Error, could not open <" << pPlayer->get_username() << ">'s game bag file for writing.";
 }
 
 UserBase* DatabaseManager::find_user(const std::string& username)
@@ -235,6 +302,18 @@ Game* DatabaseManager::find_game(const Game::GameId gameid)
 		return it->second;
 	else
 		return nullptr;
+}
+
+std::vector<PlayerUser*> DatabaseManager::find_users_who_own_game(const Game::GameId game_id)
+{
+	std::vector<PlayerUser*> result;
+	auto playerVisitorLambda = [&result, &game_id](PlayerUser* pPlayer)
+	{
+		if(pPlayer->owns_game(game_id))
+			result.push_back(pPlayer);
+	};
+	DatabaseManager::instance().visit_players(playerVisitorLambda);
+	return result;
 }
 
 std::vector<std::string> DatabaseManager::find_game(const std::string & query, SearchDescriptor flag, const char* filename)
@@ -316,20 +395,64 @@ void DatabaseManager::load_games_from_file(const char * filename)
 	}
 }
 
+void DatabaseManager::load_game_bag_from_file(PlayerUser * pPlayer)
+{
+	Game::GameId game_id;
+	std::string line;
+	char c;
+	std::string game_file = pPlayer->get_game_file();
+	std::ifstream fin(game_file);
+	if (fin)
+	{
+		while (std::getline(fin, line))
+		{
+			std::istringstream iss(line);
+			if ((iss >> game_id))
+				pPlayer->add_to_game_list(game_id);
+		}
+	}
+	else
+	{
+		std::ofstream fout(game_file, std::ios::trunc);
+	}
+}
+
+void DatabaseManager::load_games_each_player()
+{
+	for (auto& it : m_users)
+	{
+		UserBase* pUser = it.second;
+		if (pUser->get_user_type() == UserTypeId::kPlayerUser)
+		{
+			PlayerUser* pPlayer = static_cast<PlayerUser*>(it.second);
+			load_game_bag_from_file(pPlayer);
+		}
+	}
+}
+
 
 bool DatabaseManager::is_user_in_file(UserBase * pUser, const char* filename)
 {
 	std::string uname = pUser->get_username();
 	std::string listUname;
 	std::ifstream fin(filename);
-	while (fin >> listUname)
+	if (fin)
 	{
-		if (listUname == uname)
-			return true;
-		else
-			fin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		while (fin >> listUname)
+		{
+			if (listUname == uname)
+				return true;
+			else
+				fin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		}
+		return false;
 	}
-	return false;
+	else
+	{
+		std::cout << "\nError: Could not open the file <" << filename << ">!";
+		return false;
+	}
+	
 }
 
 bool DatabaseManager::is_game_in_file(Game* pgame, const char * filename)
@@ -337,14 +460,22 @@ bool DatabaseManager::is_game_in_file(Game* pgame, const char * filename)
 	Game::GameId game_id = pgame->get_game_id();
 	Game::GameId file_game_id;
 	std::ifstream fin(filename);
-	while (fin >> file_game_id)
+	if (fin)
 	{
-		if (file_game_id == game_id)
-			return true;
-		else
-			fin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		while (fin >> file_game_id)
+		{
+			if (file_game_id == game_id)
+				return true;
+			else
+				fin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		}
+		return false;
 	}
-	return false;
+	else
+	{
+		std::cout << "\nError: Could not open the file <" << filename << ">!";
+		return false;
+	}
 }
 
 

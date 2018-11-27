@@ -13,6 +13,4 @@ int main(int argc, char** argv)
 	// Let the database load all the data.
 	DatabaseManager::instance().load_data();
 	return MenuSystem::instance().run();
-
-	
 }
