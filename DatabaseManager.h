@@ -5,6 +5,7 @@
 #ifndef DATABASE_MANAGER_H
 #define DATABASE_MANAGER_H
 
+#include <cstdio>
 #include <map>
 #include <fstream>
 #include <sstream>
