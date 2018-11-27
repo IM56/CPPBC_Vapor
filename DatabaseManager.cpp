@@ -2,7 +2,6 @@
 //Name: Ismail Movahedi
 //Student number: 28039547
 
-#include <vector>
 #include <algorithm>
 #include <utility>
 
@@ -148,6 +147,13 @@ void DatabaseManager::remove_user(const std::string & username)
 	if (pUser)
 	{
 		m_users.erase(username);
+
+		if (pUser->get_user_type() == UserTypeId::kPlayerUser)
+		{
+			PlayerUser* pPlayer = static_cast<PlayerUser*>(pUser);
+			remove(pPlayer->get_game_file().c_str());
+		}
+
 		remove_user_from_file(pUser);
 		delete pUser;
 		std::cout << "\nUser <" << username << "> has been erased!\n";
