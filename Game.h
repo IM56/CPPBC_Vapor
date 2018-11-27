@@ -64,7 +64,7 @@ public:
 	GameFactory() : pGame(nullptr) {}
 	virtual ~GameFactory() {};
 
-	void createNewGame(const Game::GameId game_id, const std::string& title, const std::string& desc, const double price);
+	Game* createNewGame(const Game::GameId game_id, const std::string& title, const std::string& desc, const double price);
 
 private:
 	Game* pGame;

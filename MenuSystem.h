@@ -40,7 +40,7 @@ private:
 	void create_user();
 	void remove_user();
 
-	void add_game();
+	Game* create_game();
 	void remove_game();
 
 private:

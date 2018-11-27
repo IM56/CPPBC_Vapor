@@ -49,7 +49,6 @@ void MenuSystem::list_all_users() const
 		std::cout << rUser;
 	};
 	DatabaseManager::instance().visit_users(userVisitorLambda);
-	
 	std::cout << std::endl;
 }
 
@@ -104,7 +103,7 @@ int MenuSystem::run_admin_user_menu()
 		{
 		case '1': list_all_games(); break;
 		case '2': list_all_users(); break;
-		case '3': add_game(); break;
+		case '3': create_game(); break;
 		case '4': remove_game(); break;
 		case '5': create_user(); break;
 		case '6': remove_user(); break;
@@ -286,7 +285,7 @@ void MenuSystem::remove_user()
 	DatabaseManager::instance().remove_user(uname);
 }
 
-void MenuSystem::add_game()
+Game* MenuSystem::create_game()
 {
 	/////////////////////////////////
 	// Get Game ID from user input //
@@ -396,7 +395,7 @@ void MenuSystem::add_game()
 	} while (price < 0);
 
 
-	m_gFactory.createNewGame(game_id, title, description, price);
+	return m_gFactory.createNewGame(game_id, title, description, price);
 }
 
 void MenuSystem::remove_game()
@@ -404,7 +403,41 @@ void MenuSystem::remove_game()
 	Game::GameId game_id;
 	std::cout << "\nPlease enter the id of the game you would like to remove: ";
 	std::cin >> game_id;
-	DatabaseManager::instance().remove_game(game_id);
+	std::vector<PlayerUser*> owners = DatabaseManager::instance().find_users_who_own_game(game_id);
+	for (auto& o : owners)
+	{
+		DatabaseManager::instance().remove_game_from_bag(game_id, o); // Delete it from the player's bag file
+		o->remove_from_game_list(game_id);  // Get player to remove game from their list
+	}
+	std::cout << "\nWould you like to replace the game? (Y/N)";
+	char option;
+	while (std::cin >> option)
+	{
+		if (toupper(option) == 'Y')
+		{
+			Game* pGame = create_game();
+			for (auto& o : owners)
+			{
+				o->add_to_game_list(pGame->get_game_id()); // Get player to add game to their list
+				DatabaseManager::instance().add_game_to_bag(pGame->get_game_id(), o); // Add the game to the player's bag file
+			}
+			DatabaseManager::instance().create_game(pGame);
+			break;
+		}
+		else if (toupper(option) == 'N')
+		{
+			Game* pOld = DatabaseManager::instance().find_game(game_id);
+			for (auto& o : owners)
+			{
+				o->add_funds(pOld->get_price());
+			}
+			break;
+		}
+		else
+			std::cout << "Invalid input! Try again. (Y/N) \n";
+	}
+
+	DatabaseManager::instance().remove_game(game_id); // Remove the game from the master list
 }
 
 int MenuSystem::game_menu()
@@ -433,7 +466,6 @@ int MenuSystem::game_menu()
 
 	return result;
 }
-
 
 
 int MenuSystem::run()

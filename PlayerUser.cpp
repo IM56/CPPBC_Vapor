@@ -11,6 +11,16 @@
 // PlayerUser class implementation
 // ------------------------
 
+void PlayerUser::add_to_game_list(const Game::GameId game_id)
+{
+	m_ownedGames.push_back(game_id);
+}
+
+void PlayerUser::remove_from_game_list(const Game::GameId game_id)
+{
+	m_ownedGames.remove(game_id);
+}
+
 void PlayerUser::list_owned_games() const
 {
 	for (auto const& g : m_ownedGames)
@@ -64,6 +74,8 @@ void PlayerUser::buy_game(const Game::GameId game_id)
 					m_ownedGames.push_back(game_id);
 					// Update the files' records of the user
 					DatabaseManager::instance().update_user_in_file(this);
+					// Add to the player's game file
+					DatabaseManager::instance().add_game_to_bag(game_id, this);
 					// Create a transaction
 					return;
 				}
@@ -76,4 +88,13 @@ void PlayerUser::buy_game(const Game::GameId game_id)
 	}
 	else
 		std::cout << "\nSorry, that game is not in our store.";
+}
+
+bool PlayerUser::owns_game(const Game::GameId game_id)
+{
+	auto it = std::find(m_ownedGames.begin(), m_ownedGames.end(), game_id);
+	if (it != m_ownedGames.end())
+		return true;
+	else
+		return false;
 }
