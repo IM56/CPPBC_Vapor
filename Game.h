@@ -45,6 +45,7 @@ public:
 	void set_desc(const std::string& desc) { m_description = desc; }
 	void set_title(const std::string& title) { m_title = title; }
 
+
 private:
 	const GameId m_gameId;	// Numerical identifier for a game  (unique key).
 	std::string m_title; // The game title

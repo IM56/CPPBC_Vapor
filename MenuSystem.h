@@ -41,7 +41,10 @@ private:
 	void remove_user();
 
 	Game* create_game();
+	void play_game(PlayerUser* pPlayer);
 	void remove_game();
+	void delete_game(PlayerUser* pPlayer);
+
 
 private:
 	UserBase* m_pUser = nullptr;  // the currently logged in user.

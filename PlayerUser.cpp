@@ -52,6 +52,8 @@ void PlayerUser::add_funds()
 
 void PlayerUser::buy_game(const Game::GameId game_id)
 {
+	if (game_id == -1)
+		return;
 	Game* pgame = DatabaseManager::instance().find_game(game_id);
 	
 	if (pgame)
@@ -79,6 +81,8 @@ void PlayerUser::buy_game(const Game::GameId game_id)
 					// Create a transaction
 					return;
 				}
+				else
+					return;
 			}
 			else if (toupper(option) == 'N')
 				return;
@@ -90,10 +94,33 @@ void PlayerUser::buy_game(const Game::GameId game_id)
 		std::cout << "\nSorry, that game is not in our store.";
 }
 
+void PlayerUser::play_game(const Game::GameId game_id)
+{
+	bool isPlaying = true;
+	Game* pGame = DatabaseManager::instance().find_game(game_id);
+	std::cout << "\nYou are now playing <" << pGame->get_title() << ">! \nPress <Enter> to exit";
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	while (isPlaying)
+	{
+		std::cin.sync();
+		std::cin.get();
+		if (std::cin)
+			isPlaying = false;
+	}
+}
+
 bool PlayerUser::owns_game(const Game::GameId game_id)
 {
 	auto it = std::find(m_ownedGames.begin(), m_ownedGames.end(), game_id);
 	if (it != m_ownedGames.end())
+		return true;
+	else
+		return false;
+}
+
+bool PlayerUser::empty_bag()
+{
+	if (m_ownedGames.empty())
 		return true;
 	else
 		return false;
