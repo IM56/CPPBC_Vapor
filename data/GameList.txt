@@ -3,3 +3,4 @@
 9992 , Game2 , Just another game , 1
 9993 , Game3 , Just a sequel to another game , 1
 9994 , Game4 , Just another sequel to another game , 1
+9996 , Pacman , Eat dots. avoid ghosts. , 99

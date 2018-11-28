@@ -356,8 +356,8 @@ void DatabaseManager::display_play_log(const std::string & username)
 
 				std::string total_time = date::secs_to_formatted_time(total_secs);
 				std::string average_time = date::secs_to_formatted_time(average_secs);
-
-				std::cout << "\n" << std::left << std::setw(15) << "TOTAL TIME: " << std::setw(10) << total_time;
+			
+				std::cout << "\n\n" << std::left << std::setw(15) << "TOTAL TIME: " << std::setw(10) << total_time;
 				std::cout << "\n" << std::left << std::setw(15) << "AVERAGE TIME: " << std::setw(10) << average_time;
 				std::cout << std::endl << std::endl;
 			}
