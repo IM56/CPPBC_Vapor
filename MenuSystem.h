@@ -5,10 +5,9 @@
 #ifndef MENU_SYSTEM_H
 #define MENU_SYSTEM_H
 
-#include <iostream>
-
 #include "DatabaseManager.h"
 
+#include <iostream>
 
 
 class UserBase;
@@ -39,6 +38,7 @@ private:
 
 	void create_user();
 	void remove_user();
+	void view_play_log();
 
 	Game* create_game();
 	void play_game(PlayerUser* pPlayer);

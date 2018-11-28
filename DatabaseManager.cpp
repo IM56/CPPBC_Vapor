@@ -2,10 +2,10 @@
 //Name: Ismail Movahedi
 //Student number: 28039547
 
+#include "DatabaseManager.h"
+
 #include <algorithm>
 #include <utility>
-
-#include "DatabaseManager.h"
 
 DatabaseManager::DatabaseManager()
 {}
@@ -63,7 +63,7 @@ void DatabaseManager::add_user_to_file(UserBase* pUser)
 				{
 					fout << pUser->get_username() << " , " <<
 						pUser->get_password() << " , " <<
-						pUser->get_email();
+						pUser->get_email() << "\n";
 				}
 			}
 			break;
@@ -75,10 +75,10 @@ void DatabaseManager::add_user_to_file(UserBase* pUser)
 				std::ofstream fout(playerFile, std::ios::out | std::ios::app);
 				if (fout && !pUser->get_username().empty())
 				{
-					fout << "\n" << pUser->get_username() << " , " <<
+					fout << pUser->get_username() << " , " <<
 						pUser->get_password() << " , " <<
 						pUser->get_email() << " , " <<
-						static_cast<PlayerUser*>(pUser)->get_available_funds();
+						static_cast<PlayerUser*>(pUser)->get_available_funds() << "\n";
 				}
 				
 			}
@@ -152,7 +152,9 @@ void DatabaseManager::remove_user(const std::string & username)
 		if (pUser->get_user_type() == UserTypeId::kPlayerUser)
 		{
 			PlayerUser* pPlayer = static_cast<PlayerUser*>(pUser);
+			std::string log_file = std::string("data\\PlayLogs\\") + pPlayer->get_username() + "_play_log.txt";
 			remove(pPlayer->get_game_file().c_str());
+			remove(log_file.c_str());
 		}
 
 		remove_user_from_file(pUser);
@@ -175,7 +177,7 @@ void DatabaseManager::add_game_to_file(Game* pGame)
 				fout << pGame->get_game_id() << " , " <<
 					pGame->get_title() << " , " <<
 					pGame->get_desc() << " , " <<
-					pGame->get_price();
+					pGame->get_price() << "\n";
 			}
 		}
 	}
@@ -287,10 +289,85 @@ void DatabaseManager::add_game_to_bag(Game::GameId game_id, PlayerUser * pPlayer
 	std::ofstream fout(pPlayer->get_game_file(), std::ios::out | std::ios::app);
 	if (fout)
 	{
-		fout << game_id << ",\n";
+		fout << game_id << "," << "\n";
 	}
 	else
 		std::cout << "Error, could not open <" << pPlayer->get_username() << ">'s game bag file for writing.";
+}
+
+void DatabaseManager::log_playtime(const std::string & time, const std::string & game_title, const char* log_file)
+{
+	std::ofstream fout(log_file, std::ios::out | std::ios::app);
+	if (fout)
+	{
+		fout << date::current_date_and_time() << " , " << game_title << " , " << time << "\n";
+	}
+	else
+		std::cout << "\nError: Couldn't open play log!\n";
+}
+
+void DatabaseManager::log_transaction()
+{
+}
+
+void DatabaseManager::play_log_header()
+{
+	std::cout << "\n" << std::left << std::setw(10) << "DATE" << std::setw(3) << "|"
+		<< std::setw(10) << "TIME" << std::setw(3) << "|"
+		<< std::setw(MAX_GAME_TITLE) << "TITLE" << std::setw(3) << "|"
+		<< std::setw(10) << "PLAY TIME";
+}
+
+void DatabaseManager::display_play_log(const std::string & username)
+{
+	UserBase* pUser = find_user(username);
+	if (pUser)
+	{
+		if (pUser->get_user_type() == UserTypeId::kPlayerUser)
+		{
+			std::string line;
+			char c;
+			std::string date, time, title, play;
+			std::vector<std::string> play_times;
+			PlayerUser* pPlayer = static_cast<PlayerUser*>(pUser);
+			std::string log_file = std::string("data\\PlayLogs\\") + pPlayer->get_username() + "_play_log.txt";
+			std::ifstream fin(log_file.c_str());
+			if (fin)
+			{
+				play_log_header();
+
+				while (std::getline(fin, line))
+				{
+					std::istringstream iss(line);
+					iss >> date >> time >> c >> title >> c >> play;
+					
+					play_times.push_back(play);
+
+					std::cout << "\n" << std::left << std::setw(10) << date << std::setw(3) << "|"
+						      << std::setw(10) << time << std::setw(3) << "|"
+						      << std::setw(MAX_GAME_TITLE) << title << std::setw(3) << "|"
+						      << std::setw(10) << play;
+				}
+
+				long total_secs(0);
+				for (auto t : play_times)
+					total_secs += date::formatted_time_to_secs(t);
+				long average_secs = total_secs / play_times.size();
+
+				std::string total_time = date::secs_to_formatted_time(total_secs);
+				std::string average_time = date::secs_to_formatted_time(average_secs);
+
+				std::cout << "\n" << std::left << std::setw(15) << "TOTAL TIME: " << std::setw(10) << total_time;
+				std::cout << "\n" << std::left << std::setw(15) << "AVERAGE TIME: " << std::setw(10) << average_time;
+				std::cout << std::endl << std::endl;
+			}
+			else
+				std::cout << "\nSorry, could not open that player's play log!\n";
+	
+		}
+	}
+	else
+		std::cout << "\nSorry, that username is not our records!\n";
 }
 
 UserBase* DatabaseManager::find_user(const std::string& username)

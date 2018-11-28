@@ -94,6 +94,7 @@ int MenuSystem::run_admin_user_menu()
 		std::cout << "(4) Remove Game\n";
 		std::cout << "(5) Add User\n";
 		std::cout << "(6) Remove User\n";
+		std::cout << "(7) View Play Log\n";
 		std::cout << "(q) Logout\n";
 
 		char option;
@@ -107,6 +108,7 @@ int MenuSystem::run_admin_user_menu()
 		case '4': remove_game(); break;
 		case '5': create_user(); break;
 		case '6': remove_user(); break;
+		case '7': view_play_log(); break;
 		case 'q': result = -1; break;
 		default:  std::cout << "INVALID OPTION\n"; break;
 		}
@@ -293,6 +295,14 @@ void MenuSystem::remove_user()
 	std::cout << "\nPlease enter the username you would like to remove: ";
 	std::cin >> uname;
 	DatabaseManager::instance().remove_user(uname);
+}
+
+void MenuSystem::view_play_log()
+{
+	std::string uname;
+	std::cout << "\nPlease enter the username whose log you would like to see: ";
+	std::cin >> uname;
+	DatabaseManager::instance().display_play_log(uname);
 }
 
 Game* MenuSystem::create_game()

@@ -5,15 +5,16 @@
 #ifndef DATABASE_MANAGER_H
 #define DATABASE_MANAGER_H
 
+#include "AdminUser.h"
+#include "PlayerUser.h"
+#include "Game.h"
+#include "Date.h"
+
 #include <cstdio>
 #include <map>
 #include <fstream>
 #include <sstream>
 #include <vector>
-
-#include "AdminUser.h"
-#include "PlayerUser.h"
-#include "Game.h"
 
 //--
 // DatabaseManager is the one central database for the whole system
@@ -44,6 +45,11 @@ public:
 	void create_game(Game* pGame);                // Adds a game to the db.
 	void remove_game(Game::GameId game_id);    // Removes a game from files and db manager
 	void add_game_to_bag(Game::GameId game_id, PlayerUser* pPlayer); // Adds a game to a user's bag file
+
+	void log_playtime(const std::string& time, const std::string& game_title, const char* log_file);
+	void log_transaction();
+	void play_log_header();
+	void display_play_log(const std::string& username);
 	
 
 	UserBase* find_user(const std::string& username);                       // Finds a username in db, return nullptr if the user is not found.
