@@ -9,6 +9,7 @@
 #include "Users.h"
 #include "Game.h"
 #include "Wallet.h"
+#include "Stopwatch.h"
 
 //--
 // PlayerUser represents a system user who owns games
@@ -25,6 +26,9 @@ public:
 	{
 		std::string file = username + "_game_bag.txt";
 		m_game_bag = std::string("data\\GameBags\\") + file;
+		
+		file = username + "_transactions.txt";
+		m_transactions = std::string("data\\Transactions\\") + file;
 	}
 
 	// define the specific user type.
@@ -43,6 +47,7 @@ public:
 	void add_funds(double a) { m_wallet.deposit(a); }
 
 	std::string get_game_file() { return m_game_bag; }
+	std::string get_transaction_file() { return m_transactions; }
 
 	void buy_game(const Game::GameId game_id);
 	void play_game(const Game::GameId game_id);
@@ -53,7 +58,8 @@ public:
 private:
 	GameList m_ownedGames; // List of owned games.
 	Wallet m_wallet; // The players available funds.
-	std::string m_game_bag; // File path to the user's list of owned games
+	std::string m_game_bag; // File path to user's list of owned games
+	std::string m_transactions; //File path to user's transaction history
 };
 
 #endif

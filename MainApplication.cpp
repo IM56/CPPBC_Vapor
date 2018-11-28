@@ -2,10 +2,9 @@
 //Name: Ismail Movahedi
 //Student number: 28039547
 #pragma once
-#include <iostream>
 
-#include "DatabaseManager.h"
 #include "MenuSystem.h"
+
 
 // Entry point for the system
 int main(int argc, char** argv)

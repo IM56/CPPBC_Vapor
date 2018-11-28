@@ -2,10 +2,12 @@
 //Name: Ismail Movahedi
 //Student number: 28039547
 
+#include "DatabaseManager.h"
+#include "Date.h"
+
 #include <algorithm>
 
 
-#include "DatabaseManager.h"
 
 // ------------------------
 // PlayerUser class implementation
@@ -96,6 +98,7 @@ void PlayerUser::buy_game(const Game::GameId game_id)
 
 void PlayerUser::play_game(const Game::GameId game_id)
 {
+	Stopwatch timer;
 	bool isPlaying = true;
 	Game* pGame = DatabaseManager::instance().find_game(game_id);
 	std::cout << "\nYou are now playing <" << pGame->get_title() << ">! \nPress <Enter> to exit";
@@ -107,6 +110,10 @@ void PlayerUser::play_game(const Game::GameId game_id)
 		if (std::cin)
 			isPlaying = false;
 	}
+	int secs = timer.time_elapsed();
+	std::string time =  date::secs_to_formatted_time(secs);
+	std::string log_file = std::string("data\\PlayLogs\\") + this->get_username() + "_play_log.txt";
+	DatabaseManager::instance().log_playtime(time, pGame->get_title(), log_file.c_str());
 }
 
 bool PlayerUser::owns_game(const Game::GameId game_id)
@@ -125,3 +132,4 @@ bool PlayerUser::empty_bag()
 	else
 		return false;
 }
+
