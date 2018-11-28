@@ -249,6 +249,8 @@ void MenuSystem::create_user()
 	std::string password, verify;
 	while (password == "")   // Prompt user until they provide a password
 	{
+		std::cin.clear();
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		std::cout << "\nPlease choose a password for your account: ";
 		std::cin >> password;
 		if (password == "")
