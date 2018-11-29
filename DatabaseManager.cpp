@@ -197,8 +197,7 @@ void DatabaseManager::remove_game_from_file(Game* pGame)
 		while (std::getline(fin, line))
 		{
 			std::istringstream iss(line);
-			iss >> num;
-			if (num != game_id)
+			if ((iss >> num) && (num != game_id))
 				file_contents.push_back(line);    // Copy the contents of the file except for the line containing the game
 		}
 
@@ -295,7 +294,7 @@ void DatabaseManager::add_game_to_bag(Game::GameId game_id, PlayerUser * pPlayer
 		std::cout << "Error, could not open <" << pPlayer->get_username() << ">'s game bag file for writing.";
 }
 
-void DatabaseManager::log_playtime(const std::string & time, const std::string & game_title, const char* log_file)
+void DatabaseManager::log_playtime(const std::string & time, const std::string & game_title, const char* log_file) const
 {
 	std::ofstream fout(log_file, std::ios::out | std::ios::app);
 	if (fout)
@@ -306,16 +305,31 @@ void DatabaseManager::log_playtime(const std::string & time, const std::string &
 		std::cout << "\nError: Couldn't open play log!\n";
 }
 
-void DatabaseManager::log_transaction()
+void DatabaseManager::log_transaction(const Transaction& trans, const char* transaction_file) const
 {
+	std::ofstream fout(transaction_file, std::ios::out | std::ios::app);
+	if (fout)
+	{
+		fout << trans.transaction_to_string(',') << "\n";
+	}
+	else
+		std::cout << "\nError: Couldn't open transaction file!\n";
 }
 
-void DatabaseManager::play_log_header()
+void DatabaseManager::play_log_header() const
 {
 	std::cout << "\n" << std::left << std::setw(10) << "DATE" << std::setw(3) << "|"
 		<< std::setw(10) << "TIME" << std::setw(3) << "|"
 		<< std::setw(MAX_GAME_TITLE) << "TITLE" << std::setw(3) << "|"
 		<< std::setw(10) << "PLAY TIME";
+}
+
+void DatabaseManager::transaction_header() const
+{
+	std::cout << "\n" << std::left << std::setw(20) << "DATE AND TIME" << std::setw(3) << "|"
+		<< std::setw(35) << "DETAILS OF TRANSACTION" << std::setw(3) << "|"
+		<< std::setw(12) << "AMOUNT (\x9C)" << std::setw(3) <<  "|"
+		<< std::setw(16) << "NEW BALANCE (\x9C)" << "\n\n";
 }
 
 void DatabaseManager::display_play_log(const std::string & username)
@@ -325,18 +339,17 @@ void DatabaseManager::display_play_log(const std::string & username)
 	{
 		if (pUser->get_user_type() == UserTypeId::kPlayerUser)
 		{
-			std::string line;
-			char c;
-			std::string date, time, title, play;
-			std::vector<std::string> play_times;
-			PlayerUser* pPlayer = static_cast<PlayerUser*>(pUser);
-			std::string log_file = std::string("data\\PlayLogs\\") + pPlayer->get_username() + "_play_log.txt";
+			std::string log_file = std::string("data\\PlayLogs\\") + pUser->get_username() + "_play_log.txt";
 			std::ifstream fin(log_file.c_str());
 			if (fin)
 			{
+				std::string line;
+				char c;
+				std::string date, time, title, play;
+				std::vector<std::string> play_times;
 				play_log_header();
 
-				while (std::getline(fin, line))
+				while (std::getline(fin, line) && (line != ""))
 				{
 					std::istringstream iss(line);
 					iss >> date >> time >> c >> title >> c >> play;
@@ -368,6 +381,43 @@ void DatabaseManager::display_play_log(const std::string & username)
 	}
 	else
 		std::cout << "\nSorry, that username is not our records!\n";
+}
+
+void DatabaseManager::display_transactions(const std::string & username)
+{
+	UserBase* pUser = find_user(username);
+	if (pUser)
+	{
+		if (pUser->get_user_type() == UserTypeId::kPlayerUser)
+		{
+			std::string trans_file = std::string("data\\Transactions\\") + pUser->get_username() + ".txt";
+			std::ifstream fin(trans_file.c_str());
+			if (fin)
+			{
+				std::string line;
+				std::vector<std::string> lines;
+				while (std::getline(fin, line) && (line != ""))
+				{
+					Transaction temp(line);
+					lines.push_back(temp.transaction_to_string('|'));
+				}
+
+				transaction_header();
+
+				for (auto ln : lines)
+				{
+					std::cout << ln << "\n";
+				}
+			}
+			else
+				std::cout << "\nSorry, " << pUser->get_username() << "'s transactions could not be viewed!\n";
+		}
+		else
+			std::cout << "\nSorry, " << pUser->get_username() << " does not have any transactions!\n";
+		
+	}
+	else
+		std::cout << "\nSorry, that username is not on our records!\n";
 }
 
 UserBase* DatabaseManager::find_user(const std::string& username)

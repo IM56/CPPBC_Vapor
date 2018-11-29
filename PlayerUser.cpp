@@ -44,11 +44,32 @@ void PlayerUser::add_funds()
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	}
 	m_wallet.deposit(amount);
+	
 	std::cout << "Deposit successful! \x9C";
 	std::cout << std::setprecision(2) << amount << std::fixed;
 	std::cout << " added to your wallet.\n\n";
 
 	// Update the files' records of the user
+	std::string date_time = date::current_date_and_time();
+	std::string details = get_username() + " made a deposit";
+	Transaction trans(date_time, details, amount, get_available_funds());
+	std::string trans_log = std::string("data\\Transactions\\") + get_username() + ".txt";
+	DatabaseManager::instance().log_transaction(trans, trans_log.c_str());
+
+	DatabaseManager::instance().update_user_in_file(this);
+}
+
+void PlayerUser::add_funds(double a)
+{
+	m_wallet.deposit(a); 
+	
+	// Update the files' records of the user
+	std::string date_time = date::current_date_and_time();
+	std::string details = get_username() + " was reimbursed";
+	Transaction trans(date_time, details, a, get_available_funds());
+	std::string trans_log = std::string("data\\Transactions\\") + get_username() + ".txt";
+	DatabaseManager::instance().log_transaction(trans, trans_log.c_str());
+
 	DatabaseManager::instance().update_user_in_file(this);
 }
 
@@ -62,7 +83,7 @@ void PlayerUser::buy_game(const Game::GameId game_id)
 	{
 		if ((std::find(m_ownedGames.begin(), m_ownedGames.end(), game_id)) != m_ownedGames.end())
 		{
-			std::cout << "\n You already own the title <" << pgame->get_title() << ">!\n";
+			std::cout << "\n\nYou already own the title <" << pgame->get_title() << ">!\n";
 			return;
 		}
 
@@ -80,7 +101,13 @@ void PlayerUser::buy_game(const Game::GameId game_id)
 					DatabaseManager::instance().update_user_in_file(this);
 					// Add to the player's game file
 					DatabaseManager::instance().add_game_to_bag(game_id, this);
+					
 					// Create a transaction
+					std::string filepath = std::string("data\\Transactions\\") + get_username() + ".txt";
+					double cost = -pgame->get_price();
+					std::string details = get_username() + " bought" + pgame->get_title();
+					Transaction trans(date::current_date_and_time(), details, cost, get_available_funds());
+					DatabaseManager::instance().log_transaction(trans, filepath.c_str());
 					return;
 				}
 				else
@@ -89,7 +116,7 @@ void PlayerUser::buy_game(const Game::GameId game_id)
 			else if (toupper(option) == 'N')
 				return;
 			else
-				std::cout << "Invalid input! Try again. (Y/N) \n";
+				std::cout << "\nInvalid input! Try again. (Y/N) \n";
 		}
 	}
 	else
@@ -125,7 +152,7 @@ bool PlayerUser::owns_game(const Game::GameId game_id)
 		return false;
 }
 
-bool PlayerUser::empty_bag()
+bool PlayerUser::is_bag_empty()
 {
 	if (m_ownedGames.empty())
 		return true;

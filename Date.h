@@ -2,6 +2,11 @@
 //Name: Ismail Movahedi
 //Student number: 28039547
 
+#pragma once
+
+#ifndef DATE_H
+#define DATE_H
+
 #include <ctime>
 #include <iomanip>
 #include <iostream>
@@ -16,3 +21,5 @@ namespace date
 
 	std::string current_date_and_time();
 }
+
+#endif

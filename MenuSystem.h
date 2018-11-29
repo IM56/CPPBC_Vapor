@@ -39,6 +39,7 @@ private:
 	void create_user();
 	void remove_user();
 	void view_play_log();
+	void view_transactions();
 
 	Game* create_game();
 	void play_game(PlayerUser* pPlayer);

@@ -2,8 +2,6 @@
 //Name: Ismail Movahedi
 //Student number: 28039547
 
-#include <iomanip>
-
 #include "Wallet.h"
 
 void Wallet::deposit(double a)
