@@ -15,7 +15,7 @@ Every <b>Game</b> is identified by a unique <b>ID number</b> and features a </b>
 At start up, the user is presented with a menu, where they can:
 1. View All Games (outputs a list of all games to the screen)
 2. Login
-Q. Quit (this closes the program)
+<br>Q. Quit (this closes the program)
 
 Should an AdminUser log in, they will be presented with the option to:
 
