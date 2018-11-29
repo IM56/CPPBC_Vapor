@@ -1,6 +1,11 @@
 //C++ Boot Camp - Task 2 - 2018-19 
 //Name: Ismail Movahedi
 //Student number: 28039547
+
+/////////////////////////////////////////////// 
+// Wallet: Represents a user's account funds //
+///////////////////////////////////////////////
+
 #pragma once
 #ifndef WALLET_H
 #define WALLET_H

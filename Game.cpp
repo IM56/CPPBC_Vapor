@@ -30,6 +30,6 @@ std::ostream& operator<< (std::ostream& os, const Game& game)
 Game* GameFactory::createNewGame(const Game::GameId game_id, const std::string & title, const std::string & desc, const double price)
 {
 	pGame = new Game(game_id, title, desc, price);
-	DatabaseManager::instance().create_game(pGame);
+	DatabaseManager::instance().add_game(pGame);
 	return pGame;
 }

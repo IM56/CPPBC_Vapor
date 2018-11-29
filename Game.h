@@ -2,6 +2,10 @@
 //Name: Ismail Movahedi
 //Student number: 28039547
 
+/////////////////////////////////////////////////////////////////////////
+// Game: A simple representation of a game that users can buy and play //
+/////////////////////////////////////////////////////////////////////////
+
 #ifndef GAME_H
 #define GAME_H
 
@@ -13,15 +17,13 @@
 constexpr size_t MAX_GAME_TITLE = 20;
 constexpr size_t MAX_DESCRIPTION = 40;
 
+// Flag for indicating search by title or by description
 enum class SearchDescriptor
 {
 	kTitle = 0, 
 	kDesc
 };
 
-////////////////
-// Game class //
-////////////////
 
 class Game
 {
@@ -35,7 +37,7 @@ public:
 		, m_price(price)
 	{}
 
-	virtual ~Game() {}
+	~Game() {}
 
 	const Game::GameId get_game_id() const { return m_gameId; }
 	const std::string get_title() const { return m_title; }
@@ -47,12 +49,13 @@ public:
 
 
 private:
-	const GameId m_gameId;	// Numerical identifier for a game  (unique key).
-	std::string m_title; // The game title
+	const GameId m_gameId;	   // Numerical identifier for a game (unique key).
+	std::string m_title;       // The game's title
 	std::string m_description; // Some information about the game.
-	const double m_price;
+	const double m_price;      // Price of the game
 };
 
+// Simplifies printing game info to the console
 std::ostream& operator<< (std::ostream& os, const Game& game);
 
 ///////////////////////
@@ -63,11 +66,12 @@ class GameFactory
 {
 public:
 	GameFactory() : pGame(nullptr) {}
-	virtual ~GameFactory() {};
+	~GameFactory() {};
 
+	// Constructs a game on the heap and returns a pointer to keep reference to it
 	Game* createNewGame(const Game::GameId game_id, const std::string& title, const std::string& desc, const double price);
 
 private:
-	Game* pGame;
+	Game* pGame; // Pointer to the game that gets created
 };
 #endif

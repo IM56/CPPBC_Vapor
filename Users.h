@@ -1,6 +1,11 @@
 //C++ Boot Camp - Task 2 - 2018-19 
 //Name: Ismail Movahedi
 //Student number: 28039547
+
+//////////////////////////////////////////////////////////////////
+// UserBase: An abstract base class representing a generic user //
+//////////////////////////////////////////////////////////////////
+
 #pragma once
 #ifndef USERS_H
 #define USERS_H
@@ -15,9 +20,7 @@ using Username = std::string;
 
 constexpr size_t MAX_USERNAME = 15;
 
-//--
 // UserTypeId represents an identifier for the specific user type.
-//--
 enum class UserTypeId
 {
 	kInvalid = 0
@@ -25,9 +28,7 @@ enum class UserTypeId
 	, kAdminUser
 };
 
-//--
-// UserBase represents a user base class for the system.
-//--
+
 class UserBase
 {
 public:
@@ -40,34 +41,32 @@ public:
 
 	virtual ~UserBase() {}
 
-	// mechanism for identifying the user type at runtime.
 	virtual const UserTypeId get_user_type() const = 0;
 
 	virtual double get_available_funds() const;
-
 	const std::string get_username() const { return m_username; }
-
 	const std::string get_password() const { return m_password; }
+	const std::string get_email() const { return m_email; }
+
+	void set_email(const std::string& val) { m_email = val; }
 	void set_password(const std::string& val) { m_password = val; }
 
-	const std::string get_email() const { return m_email; }
-	void set_email(const std::string& val) { m_email = val; }
-	
 protected:
 
 
 private:
-	const Username m_username; // The users username (unique key)
-	std::string m_password; // Users password.
-	std::string m_email; // Users email address.
+	const Username m_username; // The user's username (unique key)
+	std::string m_password;    // User's password.
+	std::string m_email;       // User's email address.
 	
 };
 
+// Simplifies writing a user out to a stream
 std::ostream& operator<< (std::ostream& os, const UserBase& user);
 
-//------
-// UserFactory class
-// ------
+///////////////////////
+// UserFactory class //
+///////////////////////
 
 class UserFactory
 {

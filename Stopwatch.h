@@ -1,14 +1,16 @@
 //C++ Boot Camp - Task 2 - 2018-19 
 //Name: Ismail Movahedi
 //Student number: 28039547
+
+///////////////////////////////////////////////////////////////////////
+// Stopwatch: Measures time since its creation to the nearest second //
+///////////////////////////////////////////////////////////////////////
+
 #pragma once
 #ifndef STOPWATCH_H
 #define STOPWATCH_H
 
 #include <chrono>
-
-
-// A simple stopwatch that measures time in seconds
 
 class Stopwatch
 {
@@ -17,6 +19,7 @@ class Stopwatch
 public:
 	Stopwatch() : m_start(clock::now()) {}
 
+	// Determine how long the stopwatch has been around
 	int time_elapsed() const;
 
 private:
