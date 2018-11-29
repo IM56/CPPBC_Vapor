@@ -18,7 +18,6 @@ class PlayerUser : public UserBase
 {
 public:
 	using GameList = std::list<Game::GameId>;
-
 	using UserBase::UserBase;
 
 	PlayerUser(const Username& username, const std::string& password, const std::string& email, double funds) :
@@ -26,40 +25,32 @@ public:
 	{
 		std::string file = username + "_game_bag.txt";
 		m_game_bag = std::string("data\\GameBags\\") + file;
-		
-		file = username + "_transactions.txt";
-		m_transactions = std::string("data\\Transactions\\") + file;
 	}
 
 	// define the specific user type.
 	virtual const UserTypeId  get_user_type() const override { return UserTypeId::kPlayerUser; }
-
 	const PlayerUser::GameList& get_game_list() const { return m_ownedGames; }
 
 	void add_to_game_list(const Game::GameId game_id);
 	void remove_from_game_list(const Game::GameId game_id);
-
 	void list_owned_games() const;
-
 	virtual double get_available_funds() const override { return m_wallet.get_available_funds(); }
 
 	void add_funds();
-	void add_funds(double a) { m_wallet.deposit(a); }
+	void add_funds(double a);
 
 	std::string get_game_file() { return m_game_bag; }
-	std::string get_transaction_file() { return m_transactions; }
 
 	void buy_game(const Game::GameId game_id);
 	void play_game(const Game::GameId game_id);
 
 	bool owns_game(const Game::GameId game_id);
-	bool empty_bag();
+	bool is_bag_empty();
 
 private:
 	GameList m_ownedGames; // List of owned games.
 	Wallet m_wallet; // The players available funds.
 	std::string m_game_bag; // File path to user's list of owned games
-	std::string m_transactions; //File path to user's transaction history
 };
 
 #endif

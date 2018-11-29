@@ -123,6 +123,7 @@
     <ClCompile Include="MenuSystem.cpp" />
     <ClCompile Include="PlayerUser.cpp" />
     <ClCompile Include="Stopwatch.cpp" />
+    <ClCompile Include="Transaction.cpp" />
     <ClCompile Include="Users.cpp" />
     <ClCompile Include="Wallet.cpp" />
   </ItemGroup>
@@ -134,6 +135,7 @@
     <ClInclude Include="MenuSystem.h" />
     <ClInclude Include="PlayerUser.h" />
     <ClInclude Include="Stopwatch.h" />
+    <ClInclude Include="Transaction.h" />
     <ClInclude Include="Users.h" />
     <ClInclude Include="Wallet.h" />
   </ItemGroup>

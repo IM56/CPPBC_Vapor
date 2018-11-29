@@ -8,7 +8,7 @@
 #include "AdminUser.h"
 #include "PlayerUser.h"
 #include "Game.h"
-#include "Date.h"
+#include "Transaction.h"
 
 #include <cstdio>
 #include <map>
@@ -46,10 +46,12 @@ public:
 	void remove_game(Game::GameId game_id);    // Removes a game from files and db manager
 	void add_game_to_bag(Game::GameId game_id, PlayerUser* pPlayer); // Adds a game to a user's bag file
 
-	void log_playtime(const std::string& time, const std::string& game_title, const char* log_file);
-	void log_transaction();
-	void play_log_header();
+	void log_playtime(const std::string& time, const std::string& game_title, const char* log_file) const;
+	void log_transaction(const Transaction& trans, const char* transaction_file) const;
+	void play_log_header() const;
+	void transaction_header() const;
 	void display_play_log(const std::string& username);
+	void display_transactions(const std::string& username);
 	
 
 	UserBase* find_user(const std::string& username);                       // Finds a username in db, return nullptr if the user is not found.
@@ -100,20 +102,14 @@ private:
 
 	// Load user data from a file
 	void load_users_from_file(UserTypeId, const char* filename);
-
 	// Load all available games from file
 	void load_games_from_file(const char * filename);
-
 	// Load a user's games from their file
 	void load_game_bag_from_file(PlayerUser* pPlayer);
-
 	//Load each player user's games from their file
 	void load_games_each_player();
-
 	// Look for user in file
 	bool is_user_in_file(UserBase* pUser, const char* filename);
-
-	
 
 
 private:

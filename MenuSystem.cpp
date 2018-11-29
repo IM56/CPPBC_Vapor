@@ -94,7 +94,8 @@ int MenuSystem::run_admin_user_menu()
 		std::cout << "(4) Remove Game\n";
 		std::cout << "(5) Add User\n";
 		std::cout << "(6) Remove User\n";
-		std::cout << "(7) View Play Log\n";
+		std::cout << "(7) View Play Logs\n";
+		std::cout << "(8) View Transactions\n";
 		std::cout << "(q) Logout\n";
 
 		char option;
@@ -109,6 +110,7 @@ int MenuSystem::run_admin_user_menu()
 		case '5': create_user(); break;
 		case '6': remove_user(); break;
 		case '7': view_play_log(); break;
+		case '8': view_transactions(); break;
 		case 'q': result = -1; break;
 		default:  std::cout << "INVALID OPTION\n"; break;
 		}
@@ -145,7 +147,7 @@ int MenuSystem::run_player_user_menu()
 		case '1': list_all_games(); break;
 		case '2':
 		{
-			if (pPlayerUser->empty_bag())
+			if (pPlayerUser->is_bag_empty())
 				std::cout << "\nYou don't own any games yet!\n";
 			else
 			{
@@ -307,6 +309,14 @@ void MenuSystem::view_play_log()
 	DatabaseManager::instance().display_play_log(uname);
 }
 
+void MenuSystem::view_transactions()
+{
+	std::string uname;
+	std::cout << "\nPlease enter the username whose transactions you would like to see: ";
+	std::cin >> uname;
+	DatabaseManager::instance().display_transactions(uname);
+}
+
 Game* MenuSystem::create_game()
 {
 	/////////////////////////////////
@@ -424,7 +434,7 @@ void MenuSystem::play_game(PlayerUser * pPlayer)
 {
 	Game::GameId game_id;
 	std::string input;
-	if (pPlayer->empty_bag())
+	if (pPlayer->is_bag_empty())
 	{
 		std::cout << "\nYou don't own any games yet!\n";
 		return;
@@ -509,7 +519,7 @@ void MenuSystem::remove_game()
 void MenuSystem::delete_game(PlayerUser * pPlayer)
 {
 	Game::GameId game_id;
-	if (pPlayer->empty_bag())
+	if (pPlayer->is_bag_empty())
 	{
 		std::cout << "\nYou don't own any games yet!\n";
 		return;
