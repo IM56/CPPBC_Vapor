@@ -18,15 +18,15 @@ At start up, the user is presented with a menu, where they can press:
 3. (Q) Quit (this closes the program)
 
 Should an AdminUser log in, they will be presented with the option to press:
-1. List All Games 
-2. List All Users (displays all users to the screen in the format AUTHORITY|USERNAME|EMAIL|FUNDS)
-3. Add Game (enters a game registration screen, adds a game to the system based on input)
-4. Remove Game (gives option to delete any game from the system, gives option to replace the deleted game)
-5. Add User (enters a user registration screen, adds user to the system based on input)
-6. Remove User (gives option to delete any user from the system, except themselves)
-7. View Play Logs (displays a chosen player's play history to the screen)
-8. View Transactions (displays a chosen player's transaction history to the screen)
-9. (Q) Logout (goes back to the main menu)
+1. <b>List All Games</b> 
+2. <b>List All Users</b> (displays all users to the screen in the format AUTHORITY|USERNAME|EMAIL|FUNDS)
+3. <b>Add Game</b> (enters a game registration screen, adds a game to the system based on input)
+4. <b>Remove Game</b> (gives option to delete any game from the system, gives option to replace the deleted game)
+5. <b>Add User</b> (enters a user registration screen, adds user to the system based on input)
+6. <b>Remove User</b> (gives option to delete any user from the system, except themselves)
+7. <b>View Play Logs</b> (displays a chosen player's play history to the screen)
+8. <b>View Transactions</b> (displays a chosen player's transaction history to the screen)
+9. <b>(Q) Logout</b> (goes back to the main menu)
 
 If an AdminUser removes a game that is owned by one or more PlayerUsers, then:
 <ul>
@@ -35,10 +35,12 @@ If an AdminUser removes a game that is owned by one or more PlayerUsers, then:
 </ul>
 
 Should a PlayerUser log in, they will be shown their current balance and have the option to press:
-1. List All Games
-2. List My Games
-3. Buy Game (enters a purchase screen, asks for a Game ID corresponding to the game they would like)
-4. Play Game (asks for a Game ID that the player owns, 'loads' the game, then times and logs the session)
-5. Delete Game (allows the player to remove a game that they own from their account only)
-6. Add Funds (allows the player to add funds to their account)
-7. (Q) Logout
+1. <b>List All Games</b>
+2. <b>List My Games</b>
+3. <b>Buy Game</b> (enters a purchase screen, asks for a Game ID corresponding to the game they would like)
+4. <b>Play Game </b>(asks for a Game ID that the player owns, 'loads' the game, then times and logs the session)
+5. <b>Delete Game </b>(allows the player to remove a game that they own from their account only)
+6. <b>Add Funds</b> (allows the player to add funds to their account)
+7. <b>(Q) Logout</b>
+
+# Storage
