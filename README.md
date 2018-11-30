@@ -19,12 +19,12 @@ At start up, the user is presented with a menu, where they can press:
 
 Should an AdminUser log in, they will be presented with the option to press:
 1. <b>List All Games</b> 
-2. <b>List All Users</b> (displays all users to the screen in the format AUTHORITY|USERNAME|EMAIL|FUNDS)
+2. <b>List All Users</b> (displays all users to the screen in the format AUTHORITY | USERNAME | EMAIL | FUNDS)
 3. <b>Add Game</b> (enters a game registration screen, adds a game to the system based on input)
 4. <b>Remove Game</b> (gives option to delete any game from the system, gives option to replace the deleted game)
 5. <b>Add User</b> (enters a user registration screen, adds user to the system based on input)
 6. <b>Remove User</b> (gives option to delete any user from the system, except themselves)
-7. <b>View Play Logs</b> (displays a chosen player's play history to the screen)
+7. <b>View Play Logs</b> (displays a chosen player's play history to the screen, including total and average play times)
 8. <b>View Transactions</b> (displays a chosen player's transaction history to the screen)
 9. <b>(Q) Logout</b> (goes back to the main menu)
 
@@ -44,3 +44,13 @@ Should a PlayerUser log in, they will be shown their current balance and have th
 7. <b>(Q) Logout</b>
 
 # Storage
+All of the associated data is stored persistently in ```.txt``` files within a ```data``` folder, which is split into:
+<ul>
+  <li>Separate files containing <b>all AdminUsers</b> and <b>all PlayerUsers</b> together.</li>
+  <li>A file containing a <b>master list of games</b> available on the platform.</li>
+  <li>A folder containing a <b>transaction log</b> file for each PlayerUser.</li>
+  <li>A folder containing a <b>play history</b> file for each PlayerUser.</li>
+  <li>Each PlayerUser also has a bag file listing the IDs of the <b>games they own</b>.</li>
+</ul>
+
+At run time, whenever records change (users removed/added, games bought/removed/added, etc.) these files, as well as the running platform, are updated to record this on the fly. When the program loads up again, it reads from these modified files so that the state of the system persists between closing and starting. 
