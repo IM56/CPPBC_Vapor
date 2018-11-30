@@ -303,9 +303,15 @@ void MenuSystem::remove_user()
 	std::string uname;
 	std::cout << "\nPlease enter the username you would like to remove: ";
 	std::cin >> uname;
-	// Delegate to the database manager to remove the user from the system
-	DatabaseManager::instance().remove_user(uname);
+	if (uname == m_pUser->get_username())
+		std::cout << "\nYou cannot delete yourself!\n";
+	else
+	{
+		// Delegate to the database manager to remove the user from the system
+		DatabaseManager::instance().remove_user(uname);
+	}
 }
+		
 
 void MenuSystem::view_play_log()
 {
