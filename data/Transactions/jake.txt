@@ -1,2 +1,6 @@
-29/11/2018 17:34:43 ,  jake bought Game4             ,  -1        ,  23              
-29/11/2018 17:35:34 ,  jake made a deposit           ,  5         ,  28              
+29/11/2018 12:12:05,  jake bought Pacman            ,  -99      
+29/11/2018 17:15:59,  jake bought Piecefall         ,  -5      
+29/11/2018 17:16:11,  jake bought Game3             ,  -1      
+29/11/2018 17:17:06,  jake made a deposit           ,  20      
+29/11/2018 17:22:30,  jake was reimbursed           ,  1       
+30/11/2018 00:25:46 ,  jake was reimbursed                ,  99.00       ,  127.00          
